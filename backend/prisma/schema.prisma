@@ -8,11 +8,131 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Déclaration des enums
+enum TradeDirection {
+  Long
+  Short
+}
+
+enum TradeStatus {
+  Open
+  Closed
+  Cancelled
+}
+
+enum ScreenshotType {
+  Before
+  After
+  Annotated
+}
+
+enum Timeframe {
+  M1
+  M5
+  M15
+  H1
+  H4
+  D1
+}
+
 model User {
-  id        Int   @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   email     String   @unique
   name      String?
   password  String?
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  trades            Trade[]
+  portefeuilles     Portefeuille[]
+  capitalHistory    Capital_history[]
+  tradeJournals     Trade_journal[]
+  tradeScreenshots  Trade_screenshot[]
+}
+
+model Trade {
+  id          Int            @id @default(autoincrement())
+  userId      Int
+  paire       String
+  direction   TradeDirection @default(Long)
+  entryPrice  Float
+  exitPrice   Float?
+  stopLoss    Float?
+  takeProfit  Float?
+  size_lot    Float?
+  result      Float?
+  ratio_risk  Float?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  closedAt    DateTime?
+  status      TradeStatus    @default(Open)
+
+  // Relations
+  user              User               @relation(fields: [userId], references: [id])
+  capitalHistory    Capital_history[]
+  tradeJournals     Trade_journal[]
+  tradeScreenshots  Trade_screenshot[]
+}
+
+model Portefeuille {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @unique // Un utilisateur ne devrait avoir qu'un seul portefeuille
+  solde_initial  Decimal  @db.Decimal(10, 2)
+  capital_actuel Decimal  @db.Decimal(10, 2)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Capital_history {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  capital         Decimal  @db.Decimal(10, 2)
+  variation       Decimal  @db.Decimal(10, 2)
+  source_trade_id Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id])
+  trade Trade @relation(fields: [source_trade_id], references: [id])
+}
+
+model Trade_journal {
+  id                      Int      @id @default(autoincrement())
+  userId                  Int
+  tradeId                 Int      @unique // Un trade ne devrait avoir qu'un seul journal
+  screenshot_before_Url   String?
+  screenshot_after_Url    String?
+  plan_trade              String?
+  emotions                String?
+  indicators              String?
+  post_trade_analysis     String?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  // Relations
+  user             User               @relation(fields: [userId], references: [id])
+  trade            Trade              @relation(fields: [tradeId], references: [id])
+  tradeScreenshots Trade_screenshot[]
+}
+
+model Trade_screenshot {
+  id              Int            @id @default(autoincrement())
+  userId          Int
+  tradeId         Int
+  Trade_journalId Int
+  screenshotUrl   String
+  type            ScreenshotType @default(Before)
+  timeframe       Timeframe      @default(M15)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  // Relations
+  user         User          @relation(fields: [userId], references: [id])
+  trade        Trade         @relation(fields: [tradeId], references: [id])
+  tradeJournal Trade_journal @relation(fields: [Trade_journalId], references: [id])
 }
