@@ -1,0 +1,15 @@
+# Global
+node_modules/
+.env
+.env.local
+.env.*.local
+
+# Backend
+backend/node_modules/
+backend/.env
+backend/generated/
+backend/.prisma/
+
+# Frontend
+frontend/node_modules/
+frontend/.env

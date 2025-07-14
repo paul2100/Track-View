@@ -6,7 +6,7 @@ function Sidebar() {
   const navigate = useNavigate();
 
 const handleLogout = () => {
-  axios.post('http://localhost:3000/logout', {}, { withCredentials: true })
+  axios.post('http://localhost:3000/api/auth/logout', {}, { withCredentials: true })
     .then(res => {
       if (res.status === 200) {
         navigate('/');

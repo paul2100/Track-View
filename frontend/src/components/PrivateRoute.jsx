@@ -7,7 +7,7 @@ function PrivateRoute() {
   const [isAuth, setIsAuth] = useState(false);
 
   useEffect(() => {
-    axios.get('http://localhost:3000/me', { withCredentials: true })
+    axios.get('http://localhost:3000/api/auth/me', { withCredentials: true })
       .then(res => {
         if (res.status === 200) setIsAuth(true);
       })

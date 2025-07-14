@@ -19,7 +19,7 @@ function Signup() {
 
     try {
       console.log('Sending data:', form);
-      const res = await axios.post('http://localhost:3000/register', form, { withCredentials: true });
+      const res = await axios.post('http://localhost:3000/api/auth/register', form, { withCredentials: true });
 
       if (res.data.Status === "Success") {
         console.log('User registered successfully:', res.data.user);

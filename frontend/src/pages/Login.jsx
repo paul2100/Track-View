@@ -18,7 +18,7 @@ function Login() {
     setError('');
     
 
-  axios.post('http://localhost:3000/login', form, { withCredentials: true })
+  axios.post('http://localhost:3000/api/auth/login', form, { withCredentials: true })
   .then((res) => {
     if (res.status === 200) {
       navigate('/dashboard');
