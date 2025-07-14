@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate , Link } from 'react-router-dom';
+import axios from 'axios';
+
 
 function Login() {
 
   const [form, setForm] = useState({ email: '', password: '' });
   const [error , setError] = useState('');
-  const [succes , setSucces] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -15,26 +16,23 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setSucces('');
+    
 
-    const res = await fetch('http://localhost:4000/api/login' , {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(form),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      setError(data.message || 'Incorrect email or password');
-      return;
+  axios.post('http://localhost:3000/login', form, { withCredentials: true })
+  .then((res) => {
+    if (res.status === 200) {
+      navigate('/dashboard');
+    } else {
+      setError('Erreur lors de la connexion');
     }
-
-    localStorage.setItem('token', data.token);
-
-    setSucces('Your Login !');
-    navigate('/dashboard');
+  })
+  .catch((err) => {
+    setError('Erreur réseau, veuillez réessayer.');
+    console.error(err);
+  });
   };
+
+ 
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-red-50">

@@ -1,7 +1,24 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function Sidebar() {
+  const navigate = useNavigate();
+
+const handleLogout = () => {
+  axios.post('http://localhost:3000/logout', {}, { withCredentials: true })
+    .then(res => {
+      if (res.status === 200) {
+        navigate('/');
+      } else {
+        console.error('Erreur lors de la déconnexion');
+      }
+    })
+    .catch(err => {
+      console.error('Erreur axios logout:', err);
+    });
+};
+
   return (
     <aside className="md:w-65 hidden h-screen fixed top-0 left-0 bg-gray-50 shadow-lg border-r border-r-stone-300 z-40 md:flex flex-col justify-between">
       
@@ -19,7 +36,7 @@ function Sidebar() {
       </div>
 
       
-      <nav className="flex flex-col gap-4 px-5 py-6 flex-grow">
+      <nav className="flex flex-col gap-4 px-5 py-10 flex-grow">
         <div className="mb-2">
           <h3 className="text-xs font-semibold uppercase text-gray-500 tracking-wide">Main</h3>
         </div>
@@ -54,17 +71,47 @@ function Sidebar() {
           </svg>
           Trading Journal
         </Link>
+
+        <Link to="/trades" className="group flex items-center gap-3 text-gray-500 hover:text-rose-500 transition hover:bg-red-50 border-rose-300 rounded-lg px-2 py-2 duration-400">
+          <svg className="w-7 h-7 p-2 rounded bg-gray-200 group-hover:bg-rose-300 duration-500" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M.64 11.85L0 11.1 2.57 8.85l2.02 1.55 4.68-5.15 3.72 3.59 2.4-2.05.65.75-3.08 2.66-3.65-3.52-4.6 5.08-2.1-1.62-1.95 1.71z" />
+          </svg>
+          Performance
+        </Link>
+
+
+        <hr className='text-stone-300'/>
+
+        <div className="my-4">
+          <h3 className="text-xs font-semibold uppercase text-gray-500 tracking-wide">Account</h3>
+        </div>
+
+        <Link to="/trades" className="group flex items-center gap-3 text-gray-500 hover:text-rose-500 transition hover:bg-red-50 border-rose-300 rounded-lg px-2 py-2 duration-400">
+          <svg className="w-7 h-7 p-2 rounded bg-gray-200 group-hover:bg-rose-300 duration-500" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M.64 11.85L0 11.1 2.57 8.85l2.02 1.55 4.68-5.15 3.72 3.59 2.4-2.05.65.75-3.08 2.66-3.65-3.52-4.6 5.08-2.1-1.62-1.95 1.71z" />
+          </svg>
+          Account
+        </Link>
+
+        <Link to="/trades" className="group flex items-center gap-3 text-gray-500 hover:text-rose-500 transition hover:bg-red-50 border-rose-300 rounded-lg px-2 py-2 duration-400">
+          <svg className="w-7 h-7 p-2 rounded bg-gray-200 group-hover:bg-rose-300 duration-500" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M.64 11.85L0 11.1 2.57 8.85l2.02 1.55 4.68-5.15 3.72 3.59 2.4-2.05.65.75-3.08 2.66-3.65-3.52-4.6 5.08-2.1-1.62-1.95 1.71z" />
+          </svg>
+          Settings
+        </Link>
+
+        <Link to="/trades" className="group flex items-center gap-3 text-gray-500 hover:text-rose-500 transition hover:bg-red-50 border-rose-300 rounded-lg px-2 py-2 duration-400">
+          <svg className="w-7 h-7 p-2 rounded bg-gray-200 group-hover:bg-rose-300 duration-500" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M.64 11.85L0 11.1 2.57 8.85l2.02 1.55 4.68-5.15 3.72 3.59 2.4-2.05.65.75-3.08 2.66-3.65-3.52-4.6 5.08-2.1-1.62-1.95 1.71z" />
+          </svg>
+          How to use
+        </Link>
       </nav>
 
+
       
-      <div className="px-5 py-6 border-t">
-        <button
-          onClick={() => {
-            localStorage.removeItem('token');
-            window.location.href = '/';
-          }}
-          className="text-red-500 hover:text-red-600 transition cursor-pointer"
-        >
+      <div className="px-5 py-6 border-t border-stone-300">
+        <button onClick={handleLogout} className="text-red-500 hover:text-red-600 transition cursor-pointer">
           Logout
         </button>
       </div>

@@ -1,45 +1,40 @@
 import React, { useState } from 'react';
 import { useNavigate , Link} from 'react-router-dom';
+import axios from 'axios';
 
 function Signup() {
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setError('');
-    setSuccess('');
-
     
-    if (!e.target.terms.checked) {
-      setError('You must agree to the Terms of Service and Privacy Policy.');
-      return;
+
+
+    try {
+      console.log('Sending data:', form);
+      const res = await axios.post('http://localhost:3000/register', form, { withCredentials: true });
+
+      if (res.data.Status === "Success") {
+        console.log('User registered successfully:', res.data.user);
+        setForm({ name: '', email: '', password: '' });
+        navigate('/login');
+      } else {
+        setError(res.data.Error || 'Erreur lors de l’inscription');
+        console.error(res.data.Error);
+      }
+    } catch (err) {
+      setError('Erreur réseau, veuillez réessayer.');
+      console.error(err);
     }
+};
 
-    const res = await fetch('http://localhost:4000/api/signup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      setError(data.message || 'An error occurred');
-      return;
-    }
-
-    setSuccess('Account created successfully!');
-    setForm({ name: '', email: '', password: '' });
-    e.target.reset();
-    navigate('/login');
-  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-red-50">
@@ -134,7 +129,6 @@ function Signup() {
           </div>
 
           {error && <p className="text-red-500 text-sm">{error}</p>}
-          {success && <p className="text-green-500 text-sm">{success}</p>}
 
           <button
             type="submit"

@@ -7,21 +7,25 @@ import Pricing from './pages/Pricing';
 import Dashboard from './pages/Dashboard';
 import Journal from './pages/Journal';
 import Trades from './pages/Trades';
-
+import PrivateRoute from './components/PrivateRoute'; // adapte le chemin si besoin
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Routes publiques */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/demo" element={<Demo />} />
         <Route path="/pricing" element={<Pricing />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/journals" element={<Journal />} />
-        <Route path="/trades" element={<Trades />} />
 
+        {/* Routes protégées */}
+        <Route element={<PrivateRoute />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/journals" element={<Journal />} />
+          <Route path="/trades" element={<Trades />} />
+        </Route>
 
       </Routes>
     </BrowserRouter>
