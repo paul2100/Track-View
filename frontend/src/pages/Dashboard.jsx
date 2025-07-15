@@ -2,12 +2,29 @@ import React, {useState } from 'react';
 import Sidebar from '../components/SideBar';
 import CardStats from '../components/CardStats';
 import CapitalChart from '../components/Graphiques/CapitalChart';
+import axios from 'axios';
+import { useEffect } from 'react';
 
 function Dashboard() {
 
-  const [capital , setCapital] = useState('26536.73');
+  const [capital_actuel , setCapital_actuel] = useState('0');
+  const [total_trade , setTotal_trade] = useState('0');
   const [currencies] = useState(['$', '¥', '€']);
   const [selectedCurrency, setSelectedCurrency] = useState(currencies[0]);
+
+  useEffect(() => {
+    axios.get('http://localhost:3000/api/portefeuille/getportefeuille', { withCredentials: true })
+      .then(res => setCapital_actuel(res.data.portefeuille.capital_actuel))
+      .catch(err => console.error(err.response?.data || err.message));
+  }, []);
+
+  useEffect(() => {
+    axios.get('http://localhost:3000/api/trade/getTotalTrades', {withCredentials: true})
+    .then(res => setTotal_trade(res.data.totalTrade))
+    .catch(err => console.log("Erreur"));
+  }, []);
+
+
 
   return (
     <div className="flex">
@@ -41,8 +58,8 @@ function Dashboard() {
         </div>
 
         <div className="flex md:justify-between md:flex-row flex-col">
-          <CardStats title = "Capital" value = {capital} currency={selectedCurrency}  img = '/src/assets/icon.svg' />
-          <CardStats title = "Total trades" value = {'17'}   img = '/src/assets/icon.svg'/>
+          <CardStats title = "Capital" value = {capital_actuel} currency={selectedCurrency}  img = '/src/assets/icon.svg' />
+          <CardStats title = "Total trades" value = {total_trade}   img = '/src/assets/icon.svg'/>
           <CardStats title = "Daily result" value = {'-636.93'} currency={selectedCurrency} img = '/src/assets/icon.svg'/>
           <CardStats title = "Monthly result" value = {'2563.38'} currency={selectedCurrency} img = '/src/assets/icon.svg'/>
         </div>

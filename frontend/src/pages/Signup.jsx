@@ -21,14 +21,14 @@ function Signup() {
       console.log('Sending data:', form);
       const res = await axios.post('http://localhost:3000/api/auth/register', form, { withCredentials: true });
 
-      if (res.data.Status === "Success") {
-        console.log('User registered successfully:', res.data.user);
-        setForm({ name: '', email: '', password: '' });
-        navigate('/login');
-      } else {
-        setError(res.data.Error || 'Erreur lors de l’inscription');
-        console.error(res.data.Error);
-      }
+      if (res.data.success) {
+      console.log('User registered successfully:', res.data.user);
+      setForm({ name: '', email: '', password: '' });
+      navigate('/login');
+    } else {
+      setError(res.data.error || 'Erreur lors de l’inscription');
+      console.error(res.data.error);
+    }
     } catch (err) {
       setError('Erreur réseau, veuillez réessayer.');
       console.error(err);
