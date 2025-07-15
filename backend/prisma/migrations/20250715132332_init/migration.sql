@@ -10,8 +10,17 @@ CREATE TYPE "ScreenshotType" AS ENUM ('Before', 'After', 'Annotated');
 -- CreateEnum
 CREATE TYPE "Timeframe" AS ENUM ('M1', 'M5', 'M15', 'H1', 'H4', 'D1');
 
--- AlterTable
-ALTER TABLE "User" ALTER COLUMN "updatedAt" DROP DEFAULT;
+-- CreateTable
+CREATE TABLE "User" (
+    "id" SERIAL NOT NULL,
+    "email" TEXT NOT NULL,
+    "name" TEXT,
+    "password" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "Trade" (
@@ -90,6 +99,9 @@ CREATE TABLE "Trade_screenshot" (
 
     CONSTRAINT "Trade_screenshot_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Portefeuille_userId_key" ON "Portefeuille"("userId");
