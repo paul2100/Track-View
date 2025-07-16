@@ -5,7 +5,10 @@ const VALID_DIRECTIONS = ['LONG', 'SHORT'];
 
 export async function createTrade(req, res) {
   const userId = req.user.id;
-  const {status,direction,paire,ratio_risk,result,size_lot,takeProfit,stopLoss,exitPrice,entryPrice} = req.body;
+  let {status,direction,paire,ratio_risk,result,size_lot,takeProfit,stopLoss,exitPrice,entryPrice} = req.body;
+  console.log(req.body);
+
+  status = 'OPEN';
 
   if (!status || !direction || !paire || typeof entryPrice !== 'number' || entryPrice <= 0) {
     return res.status(400).json({ error: 'Champs obligatoires manquants ou invalides' });
@@ -168,6 +171,20 @@ export async function updateTrade(req, res) {
     return res.status(500).json({ error: 'Erreur serveur lors de la mise à jour du trade.', details: error.message });
   }
 }
+
+
+export async function getAllTrades(req , res) {
+  const userId = req.user.id;
+
+  const allTrades = await prisma.trade.findMany({ where: { userId } });
+
+  if (allTrades.length === 0) {
+    return res.status(404).json({ error: 'Aucun trade trouvé !' });
+  }
+
+  res.status(200).json({ success: true, allTrades });
+}
+
 
 
 export async function getTotalTrades(req, res) {
