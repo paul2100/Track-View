@@ -17,19 +17,18 @@ function Login() {
     e.preventDefault();
     setError('');
     
-
-  axios.post('http://localhost:3000/api/auth/login', form, { withCredentials: true })
-  .then((res) => {
-    if (res.status === 200) {
-      navigate('/dashboard');
-    } else {
-      setError('Erreur lors de la connexion');
-    }
-  })
-  .catch((err) => {
-    setError('Erreur réseau, veuillez réessayer.');
-    console.error(err);
-  });
+    axios.post('http://localhost:3000/api/auth/login', form, { withCredentials: true })
+    .then((res) => {
+      if (res.status === 200) {
+        navigate('/dashboard');
+      } else {
+        setError('Erreur lors de la connexion');
+      }
+    })
+    .catch((err) => {
+      setError('Erreur réseau, veuillez réessayer.');
+      console.error(err);
+    });
   };
 
  
