@@ -6,6 +6,7 @@ import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
 import portefeuilleRoutes from './routes/portefeuille.routes.js';
 import tradeRoutes from './routes/trade.routes.js';
+import statsRoutes from './routes/stats.routes.js';
 dotenv.config();
 
 const app = express();
@@ -23,5 +24,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/trade', tradeRoutes);
 app.use('/api/portefeuille', portefeuilleRoutes);
+app.use('/api/stats', statsRoutes);
 
 export default app;

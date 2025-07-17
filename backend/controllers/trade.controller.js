@@ -85,6 +85,7 @@ export async function updateTrade(req, res) {
     const oldResult = Number(tradeById.result ?? 0);
     const newResult = result !== undefined ? Number(result) : oldResult;
 
+
     if (oldStatus !== 'CLOSED' && newStatus === 'CLOSED') {
       newCapital += newResult;
 
@@ -121,8 +122,8 @@ export async function updateTrade(req, res) {
       });
     }
     else if (oldStatus === 'CLOSED' && newStatus === 'CLOSED' && newResult !== oldResult) {
-      const variation = newResult - oldResult;
-      newCapital += variation;
+      const resultDifference = newResult - oldResult;
+      newCapital += resultDifference;
 
       await prisma.portefeuille.update({
         where: { userId },
@@ -137,11 +138,19 @@ export async function updateTrade(req, res) {
         capitalHistoryEntry = await prisma.capital_history.update({
           where: { id: capitalHistoryEntryToUpdate.id },
           data: {
-            variation,
+            variation: newResult, 
             capital: newCapital.toString(),
           },
         });
       }
+    }
+
+    let closedAtValue = tradeById.closedAt;
+    
+    if (oldStatus !== 'CLOSED' && newStatus === 'CLOSED') {
+      closedAtValue = new Date();
+    } else if (oldStatus === 'CLOSED' && newStatus !== 'CLOSED') {
+      closedAtValue = null;
     }
 
     const tradeUpdate = await prisma.trade.update({
@@ -157,6 +166,7 @@ export async function updateTrade(req, res) {
         stopLoss: stopLoss ?? tradeById.stopLoss,
         exitPrice: exitPrice ?? tradeById.exitPrice,
         result: result ?? tradeById.result,
+        closedAt: closedAtValue,
       },
     });
 
@@ -173,17 +183,89 @@ export async function updateTrade(req, res) {
 }
 
 
+export async function deleteTradeById(req , res) {
+  const userId = req.user.id;
+  const tradeId = Number(req.params.id);
+
+  const findTradeId = await prisma.trade.findUnique({where:{id: tradeId}});
+
+  if (!findTradeId) {
+    return res.status(404).json({error: 'Aucuns trade trouvé !'});
+  }
+
+  if (findTradeId.userId !== userId) {
+    return res.status(403).json({error: `Vous n'avez pas accès ou le trade ne vous appartient pas !`})
+  }
+
+  if (findTradeId.status === 'CLOSED') {
+    const capitalHistory = await prisma.capital_history.findFirst({where:{source_trade_id: tradeId}});
+
+    if (capitalHistory) {
+      const portefeuille = await prisma.portefeuille.findUnique({where:{userId: userId}});
+      if (portefeuille) {
+        const newCapital = (portefeuille.capital_actuel) - (capitalHistory.variation);
+
+        if (newCapital < 0 ) {
+          return res.status(404).json({error: 'Erreur le capital ne peut pas etre inferieur a 0'})
+        }
+
+        await prisma.portefeuille.update({
+          where:{userId: userId},
+          data: {
+            capital_actuel: newCapital
+          }
+        })
+
+        await prisma.capital_history.delete({where:{id: capitalHistory.id}});
+      }
+      
+    }
+  }
+
+  await prisma.trade.delete({where:{id: tradeId}});
+
+
+  res.status(200).json({success: true , })
+}
+
+
 export async function getAllTrades(req , res) {
   const userId = req.user.id;
 
-  const allTrades = await prisma.trade.findMany({ where: { userId } });
+  try {
+    const allTrades = await prisma.trade.findMany({ where: { userId } });
+    
+    if (allTrades.length === 0) {
+      return res.status(200).json({ success: true, allTrades: [] });
+    }
 
-  if (allTrades.length === 0) {
-    return res.status(404).json({ error: 'Aucun trade trouvé !' });
+    res.status(200).json({ success: true, allTrades });
+  } catch (error) {
+    console.error('Erreur getAllTrades:', error);
+    return res.status(500).json({ error: 'Erreur serveur' });
+  }
+}
+
+export async function getTradeById(req , res) {
+  const userId = req.user.id;
+  const tradeId = Number(req.params.id);
+
+  const tradeById = await prisma.trade.findUnique({where:{id: tradeId}});
+
+  if (!tradeById) {
+    return res.status(404).json({error: 'Trade introuvable !'});
   }
 
-  res.status(200).json({ success: true, allTrades });
+  if (tradeById.userId !== userId) {
+    return res.status(403).json({error: 'Accès non autorisé pour ce trade !'})
+  }
+
+  res.status(200).json({success: true , trade: tradeById});
 }
+
+
+
+
 
 
 
