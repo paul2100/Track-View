@@ -19,7 +19,7 @@ function PrivateRoute() {
       });
   }, []);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div className='flex justify-center items-center h-screen'><img src="/src/assets/bouncing-circles.svg" alt="" className='h-30 w-30'/></div>;
 
   return isAuth ? <Outlet /> : <Navigate to="/login" />;
 }

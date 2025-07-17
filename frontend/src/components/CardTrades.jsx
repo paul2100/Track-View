@@ -22,12 +22,12 @@ function formatDate(dateString) {
   });
 }
 
-function CardTrades({ trade }) {
+function CardTrades({ trade, onUpdate , onDelete }) {
   const { label, color } = getStatusStyle(trade.status);
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div className="relative p-6 rounded-2xl border border-orange-400/30 bg-white text-black font-semibold shadow-lg overflow-hidden md:w-[30%] w-full my-5 mr-10">
+    <div className="relative p-6 rounded-2xl border border-orange-400/30 bg-white text-black font-semibold shadow-lg overflow-hidden md:w-[100%] w-full mr-10">
       <div className="absolute -top-6 -left-6 w-24 h-24 bg-orange-500 opacity-50 rounded-full blur-2xl z-0" />
 
       <div className="relative z-10 space-y-4">
@@ -49,13 +49,20 @@ function CardTrades({ trade }) {
             {menuOpen && (
               <div className="absolute right-0 mt-2 w-32 bg-white border rounded shadow z-50 text-sm">
                 <button
-                  onClick={() => { setMenuOpen(false);}}
+                  onClick={() => {
+                    setMenuOpen(false);
+                    onUpdate();
+                  }}
                   className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                 >
                   Update
                 </button>
                 <button
-                  onClick={() => { setMenuOpen(false); alert("Delete"); }}
+                  onClick={() => {
+                    setMenuOpen(false);
+                    onDelete();
+                    
+                  }}
                   className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600"
                 >
                   Delete

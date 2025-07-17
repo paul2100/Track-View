@@ -5,7 +5,7 @@ import CapitalChart from '../components/Graphiques/CapitalChart';
 import axios from 'axios';
 import FormAddCapital from '../components/FormAddCapital';
 import { ToastContainer , toast } from 'react-toastify';
-import { useLocation } from 'react-router-dom';
+
 
 
 function Dashboard() {
@@ -14,14 +14,7 @@ function Dashboard() {
   const [hasPortefeuille, setHasPortefeuille] = useState(true);
   const [currencies] = useState(['$', '¥', '€']);
   const [selectedCurrency, setSelectedCurrency] = useState(currencies[0]);
-  const location = useLocation();
 
-  useEffect(() => {
-    if (location.state?.toastMessage) {
-      toast.success(location.state.toastMessage);
-      window.history.replaceState({}, document.title);
-    }
-  }, [location.state]);
 
   useEffect(() => {
     axios.get('http://localhost:3000/api/portefeuille/getportefeuille', { withCredentials: true })
@@ -93,8 +86,6 @@ function Dashboard() {
             <FormAddCapital />
           </div>
         )}
-
-        <ToastContainer position="top-right" autoClose={3000} />
 
       </main>
     </div>

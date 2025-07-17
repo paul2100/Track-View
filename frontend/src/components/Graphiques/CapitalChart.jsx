@@ -13,7 +13,7 @@ function CapitalChart({ data }) {
         </div>
       ) : (
         <div className="text-center flex justify-center flex-col items-center text-gray-500">
-          <div className='w-15 h-15 flex justify-center items-center rounded-4xl bg-red-100'>
+          <div className='w-15 h-15 flex justify-center items-center rounded-4xl bg-rose-100'>
               <img src="/src/assets/image.svg" alt="empty" className="mx-auto w-6 h-6 opacity-50" />
           </div>
           <p className="font-medium">No data yet</p>
