@@ -32,11 +32,6 @@ function Dashboard() {
       });
   }, []);
 
-  useEffect(() => {
-    axios.get('http://localhost:3000/api/trade/getTotalTrades', { withCredentials: true })
-      .then(res => setTotal_trade(res.data.totalTrade))
-      .catch(err => console.log("Erreur"));
-  }, []);
 
   return (
     <div className="flex relative">

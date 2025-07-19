@@ -77,6 +77,7 @@ function FormAddTrade({onSuccess}) {
         if (res.status === 200) {
           toast.success("Trade ajouté avec succès !");
           onSuccess?.();
+          window.location.reload();
         } else {
           setError("Erreur lors de l'ajout de votre trade.");
           toast.error("Erreur lors de l'ajout de votre trade.");

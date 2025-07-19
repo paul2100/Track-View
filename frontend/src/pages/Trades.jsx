@@ -15,7 +15,122 @@ function Trades({tradeId}) {
   const [allTrades, setAllTrades] = useState([]);
   const [selectedTradeId, setSelectedTradeId] = useState(null);
   const [createFormOpen, setCreateFormOpen] = useState(false);
+  const [averageStats , setAverageStats] = useState('');
+  const [allTradesStats , setAllTradesStats] = useState('');
+  const [succesRateStats , setSuccesRateStats] = useState('');
+  const [drawdownStats , setDrawdownStats] = useState('');
+  const [winTradeTotalStats , setWinTradeTotalStats] = useState('');
+  const [lostTradeTotalStats , setLostTradeTotalStats] = useState('');
+  const [bestTradeStats , setBestTradeStats] = useState('');
+  const [worstTradeStats , setWorstTradeStats] = useState('');
+  const [period, setPeriod] = useState('week');
   const location = useLocation();
+
+
+
+useEffect(() => {
+  axios.get(`http://localhost:3000/api/stats/getSuccesRate?period=${period}`, { withCredentials: true })
+    .then((res) => {
+      if (res.status === 200) {
+        setSuccesRateStats(res.data.pourcentageSuccesRate);
+      }
+    })
+    .catch(err => {
+      console.error(err.response?.data || err.message);
+    });
+}, [period]);
+
+
+useEffect(() => {
+  axios.get(`http://localhost:3000/api/stats/getWinTrade?period=${period}`, { withCredentials: true })
+    .then((res) => {
+      if (res.status === 200) {
+        setWinTradeTotalStats(res.data.winCount);
+      }
+    })
+    .catch(err => {
+      console.error(err.response?.data || err.message);
+    });
+}, [period]);
+
+
+useEffect(() => {
+  axios.get(`http://localhost:3000/api/stats/getLossTrade?period=${period}`, { withCredentials: true })
+    .then((res) => {
+      if (res.status === 200) {
+        setLostTradeTotalStats(res.data.lostCount);
+      }
+    })
+    .catch(err => {
+      console.error(err.response?.data || err.message);
+    });
+}, [period]);
+
+
+useEffect(() => {
+  axios.get(`http://localhost:3000/api/stats/getTotalTrades?period=${period}`, {withCredentials: true})
+  .then((res) => {
+    if (res.status === 200) {
+      setAllTradesStats(res.data.totalTrade)
+    }
+      })
+      .catch(err => {
+        console.error(err.response?.data || err.message);
+      });
+  }, [period]);
+
+
+useEffect(() => {
+  axios.get(`http://localhost:3000/api/stats/getMaxWin?period=${period}`, {withCredentials: true})
+  .then((res) => {
+    if (res.status === 200) {
+      setBestTradeStats(res.data.bestResult)
+    }
+      })
+      .catch(err => {
+        console.error(err.response?.data || err.message);
+      });
+  }, [period]);
+
+
+useEffect(() => {
+  axios.get(`http://localhost:3000/api/stats/getMaxLost?period=${period}`, {withCredentials: true})
+  .then((res) => {
+    if (res.status === 200) {
+      setWorstTradeStats(res.data.worstResult)
+    }
+      })
+      .catch(err => {
+        console.error(err.response?.data || err.message);
+      });
+  }, [period]);
+
+
+useEffect(() => {
+  axios.get(`http://localhost:3000/api/stats/getMaxDrawdown?period=${period}`, {withCredentials: true})
+  .then((res) => {
+    if (res.status === 200) {
+      setDrawdownStats(res.data.maxDrawdown)
+    }
+      })
+      .catch(err => {
+        console.error(err.response?.data || err.message);
+      });
+  }, [period]);
+
+useEffect(() => {
+  axios.get(`http://localhost:3000/api/stats/getAverageTimeTrade?period=${period}`, {withCredentials: true})
+  .then((res) => {
+    if (res.status === 200) {
+      setAverageStats(res.data.averageTime)
+    }
+      })
+      .catch(err => {
+        console.error(err.response?.data || err.message);
+      });
+  }, [period]);
+
+
 
   const fetchTrades = () => {
     axios.get('http://localhost:3000/api/trade/getAllTrades', { withCredentials: true })
@@ -37,6 +152,7 @@ function Trades({tradeId}) {
     .then((res) => {
       if (res.status === 200) {
         toast.success("Trade supprimé avec succès !");
+        window.location.reload();
         fetchTrades();
       }
     })
@@ -70,13 +186,19 @@ function Trades({tradeId}) {
             </span>
           </div>
 
-          <div className="w-full md:w-auto">
+          <div className="w-full md:w-auto flex md:flex-row-reverse flex-col md:items-center md:justify-center">
             <button
               onClick={() => setCreateFormOpen(true)}
               className="w-full md:w-auto bg-orange-500 text-white py-2 px-6 rounded-md hover:bg-orange-600 transition cursor-pointer"
             >
               + Create
             </button>
+
+          <div className="md:mr-5 md:mt-0 mt-10">
+          <button onClick={() => setPeriod('week')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-black/40 text-black/50 hover:scale-110 hover:shadow-orange-500 duration-300 ${period === 'week' ? 'text-orange-400' : ''}`}>Week</button>
+          <button onClick={() => setPeriod('month')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-black/40 text-black/50 hover:scale-110 hover:shadow-orange-500 duration-300 ${period === 'month' ? 'text-orange-400' : ''}`}>Month</button>
+          <button onClick={() => setPeriod('year')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-black/40 text-black/50 hover:scale-110 hover:shadow-orange-500 duration-300 ${period === 'year' ? 'text-orange-400' : ''}`}>Year</button>
+        </div>
           </div>
         </div>
 
@@ -95,15 +217,16 @@ function Trades({tradeId}) {
         )}
 
         <div className='my-5 py-5 w-full shadow-xs rounded-lg grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6'>
-          <CardStatsTrades title={'Average time of a trade'} stats={'2 days and 20 hours'} icons={Hourglass} />
-          <CardStatsTrades title={'Success rate'} stats={'89%'} icons={CircleDollarSign}/>
-          <CardStatsTrades title={'Total trade during the month'} stats={'9'} icons={Calculator}/>
-          <CardStatsTrades title={'Drawdown max'} stats={'-223'} icons={MoveDownRight}/>
-          <CardStatsTrades title={'Winning trade'} stats={'4'} icons={MoveUpRight}/>
-          <CardStatsTrades title={'Winning percentage'} stats={'40%'} icons={Percent}/>
-          <CardStatsTrades title={'Losing trade'} stats={'5'} icons={MoveDownRight}/>
-          <CardStatsTrades title={'Loss percentage'} stats={'60%'} icons={Percent}/>
+          <CardStatsTrades title={'Average time of a trade'} stats={averageStats || '0'} icons={Hourglass} />
+          <CardStatsTrades title={'Success rate'} stats={succesRateStats + '%'} icons={Percent}/>
+          <CardStatsTrades title={'Total trade'} stats={allTradesStats} icons={Calculator}/>
+          <CardStatsTrades title={'Drawdown max'} stats={drawdownStats ? '-' + drawdownStats : '0'} icons={MoveDownRight}/>
+          <CardStatsTrades title={'Winning trade'} stats={winTradeTotalStats || '0'} icons={MoveUpRight}/>
+          <CardStatsTrades title={'The biggest gain'} stats={bestTradeStats || '0'} icons={CircleDollarSign}/>
+          <CardStatsTrades title={'Losing trade'} stats={lostTradeTotalStats || '0'} icons={MoveDownRight}/>
+          <CardStatsTrades title={'The biggest loss'} stats={worstTradeStats || '0'} icons={CircleDollarSign}/>
         </div>
+
 
         {allTrades.length === 0 ? (
           <div className='flex justify-center flex-col items-center h-screen bg-gray-100 rounded-lg'>

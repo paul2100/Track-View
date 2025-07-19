@@ -73,9 +73,11 @@ function FormUpdateTrades({ tradeId , onSuccess }) {
     .then((res) => {
     if (res.status === 200 && onSuccess) {
       onSuccess();
+      window.location.reload();
     }
     })
     .catch((error) => {
+      
       const message = error.response?.data?.error || error.message || "Erreur réseau";
       setError(message);
       toast.error(message);

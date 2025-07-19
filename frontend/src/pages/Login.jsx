@@ -26,7 +26,7 @@ function Login() {
       }
     })
     .catch((err) => {
-      setError('Erreur réseau, veuillez réessayer.');
+      setError('Password or email invalid.');
       console.error(err);
     });
   };
