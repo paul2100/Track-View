@@ -8,58 +8,50 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Pas d'enums - on utilise des strings avec validation côté app
-
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
-  password  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  trades            Trade[]
-  portefeuilles     Portefeuille[]
-  capitalHistory    Capital_history[]
-  tradeJournals     Trade_journal[]
-  tradeScreenshots  Trade_screenshot[]
+  id               Int                @id @default(autoincrement())
+  email            String             @unique
+  name             String?
+  password         String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  capitalHistory   Capital_history[]
+  portefeuilles    Portefeuille?
+  trades           Trade[]
+  tradeJournals    Trade_journal[]
+  tradeScreenshots Trade_screenshot[]
 }
 
 model Trade {
-  id          Int            @id @default(autoincrement())
-  userId      Int
-  paire       String
-  direction   String         @default("Long")
-  entryPrice  Float
-  exitPrice   Float?
-  stopLoss    Float?
-  takeProfit  Float?
-  size_lot    Float?
-  result      Float?
-  ratio_risk  Float?
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  closedAt    DateTime?
-  status      String         @default("Open")
-
-  // Relations
-  user              User               @relation(fields: [userId], references: [id])
-  capitalHistory    Capital_history[]
-  tradeJournals     Trade_journal[]
-  tradeScreenshots  Trade_screenshot[]
+  id               Int                @id @default(autoincrement())
+  userId           Int
+  paire            String
+  entryPrice       Float
+  exitPrice        Float?
+  stopLoss         Float?
+  takeProfit       Float?
+  size_lot         Float?
+  result           Float?
+  ratio_risk       Float?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  closedAt         DateTime?
+  direction        String             @default("Long")
+  status           String             @default("Open")
+  capitalHistory   Capital_history[]
+  user             User               @relation(fields: [userId], references: [id])
+  tradeJournals    Trade_journal?
+  tradeScreenshots Trade_screenshot[]
 }
 
 model Portefeuille {
   id             Int      @id @default(autoincrement())
-  userId         Int      @unique // Un utilisateur ne devrait avoir qu'un seul portefeuille
+  userId         Int      @unique
   solde_initial  Decimal  @db.Decimal(10, 2)
   capital_actuel Decimal  @db.Decimal(10, 2)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
-
-  // Relations
-  user User @relation(fields: [userId], references: [id])
+  user           User     @relation(fields: [userId], references: [id])
 }
 
 model Capital_history {
@@ -70,44 +62,38 @@ model Capital_history {
   source_trade_id Int
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-
-  // Relations
-  user  User  @relation(fields: [userId], references: [id])
-  trade Trade @relation(fields: [source_trade_id], references: [id])
+  trade           Trade    @relation(fields: [source_trade_id], references: [id])
+  user            User     @relation(fields: [userId], references: [id])
 }
 
 model Trade_journal {
-  id                      Int      @id @default(autoincrement())
-  userId                  Int
-  tradeId                 Int      @unique // Un trade ne devrait avoir qu'un seul journal
-  screenshot_before_Url   String?
-  screenshot_after_Url    String?
-  plan_trade              String?
-  emotions                String?
-  indicators              String?
-  post_trade_analysis     String?
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
-
-  // Relations
-  user             User               @relation(fields: [userId], references: [id])
-  trade            Trade              @relation(fields: [tradeId], references: [id])
-  tradeScreenshots Trade_screenshot[]
+  id                    Int                @id @default(autoincrement())
+  userId                Int
+  tradeId               Int                @unique
+  screenshot_before_Url String?
+  screenshot_after_Url  String?
+  plan_trade            String?
+  emotions              String?
+  indicators            String?
+  post_trade_analysis   String?
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  trade                 Trade              @relation(fields: [tradeId], references: [id])
+  user                  User               @relation(fields: [userId], references: [id])
+  tradeScreenshots      Trade_screenshot[]
 }
 
 model Trade_screenshot {
-  id              Int            @id @default(autoincrement())
+  id              Int           @id @default(autoincrement())
   userId          Int
   tradeId         Int
   Trade_journalId Int
   screenshotUrl   String
-  type            String         @default("Before")
-  timeframe       String         @default("M15")
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-
-  // Relations
-  user         User          @relation(fields: [userId], references: [id])
-  trade        Trade         @relation(fields: [tradeId], references: [id])
-  tradeJournal Trade_journal @relation(fields: [Trade_journalId], references: [id])
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  type            String        @default("Before")
+  timeframe       String        @default("M15")
+  tradeJournal    Trade_journal @relation(fields: [Trade_journalId], references: [id])
+  trade           Trade         @relation(fields: [tradeId], references: [id])
+  user            User          @relation(fields: [userId], references: [id])
 }

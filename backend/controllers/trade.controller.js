@@ -6,7 +6,6 @@ const VALID_DIRECTIONS = ['LONG', 'SHORT'];
 export async function createTrade(req, res) {
   const userId = req.user.id;
   let {status,direction,paire,ratio_risk,result,size_lot,takeProfit,stopLoss,exitPrice,entryPrice} = req.body;
-  console.log(req.body);
 
   status = 'OPEN';
 
@@ -33,7 +32,6 @@ export async function createTrade(req, res) {
 
     return res.status(200).json({ success: true, trade });
   } catch (error) {
-    console.error('Erreur createTrade:', error);
     return res.status(500).json({ error: "Erreur serveur lors de la création du trade." });
   }
 }
@@ -177,7 +175,6 @@ export async function updateTrade(req, res) {
       deleteEntryCapitalHistory,
     });
   } catch (error) {
-    console.error('Erreur updateTrade:', error);
     return res.status(500).json({ error: 'Erreur serveur lors de la mise à jour du trade.', details: error.message });
   }
 }
@@ -241,7 +238,6 @@ export async function getAllTrades(req , res) {
 
     res.status(200).json({ success: true, allTrades });
   } catch (error) {
-    console.error('Erreur getAllTrades:', error);
     return res.status(500).json({ error: 'Erreur serveur' });
   }
 }
@@ -263,20 +259,3 @@ export async function getTradeById(req , res) {
   res.status(200).json({success: true , trade: tradeById});
 }
 
-
-
-
-
-
-
-export async function getTotalTrades(req, res) {
-  const userId = req.user.id;
-
-  try {
-    const totalTrade = await prisma.trade.count({ where: { userId } });
-    return res.status(200).json({ success: true, totalTrade });
-  } catch (error) {
-    console.error('Erreur getTotalTrades:', error);
-    return res.status(500).json({ error: "Erreur lors de la récupération des trades." });
-  }
-}
