@@ -64,7 +64,7 @@ export async function getSuccesRate(req, res) {
 
     const positiveTrades = trades.filter(t => t.result > 0);
     const ratio = (positiveTrades.length / trades.length) * 100;
-    const pourcentageSuccesRate = Number(ratio.toFixed(1));
+    const pourcentageSuccesRate = Number(ratio.toFixed(2));
 
     return res.status(200).json({ success: true, pourcentageSuccesRate });
 
@@ -133,7 +133,7 @@ export async function getMaxDrawdown(req, res) {
       if (drawdown > maxDrawdown) maxDrawdown = drawdown;
     }
 
-    return res.status(200).json({ success: true, maxDrawdown });
+    return res.status(200).json({ success: true, maxDrawdown: Number(maxDrawdown.toFixed(2))});
 
   } catch (error) {
     console.error("Erreur getMaxDrawdown:", error);
@@ -247,4 +247,152 @@ export async function getMaxLost(req, res) {
   const worstResult = Math.min(...results);
 
   return res.status(200).json({ success: true, worstResult });
+}
+
+
+export async function getCapitalHistory(req , res) {
+  const userId = req.user.id;
+
+  const portefeuilleUser = await prisma.portefeuille.findUnique({
+    where:{userId} ,
+    select: {
+      createdAt: true,
+      solde_initial: true
+    } 
+  });
+
+  if (!portefeuilleUser) {
+    return res.status(404).json({error: `L'user n'a pas de portefeuille !`});
+  }
+  
+  const capital_history = await prisma.capital_history.findMany({
+  where: {
+    userId,
+    trade: {
+      status: 'CLOSED' 
+    }
+  },
+  orderBy: {
+    createdAt: 'asc'
+  },
+  select: {
+    createdAt: true,
+    capital: true
+  }
+});
+
+
+const capitalEvolution = [
+  {
+    createdAt: portefeuilleUser.createdAt,
+    capital: Number(portefeuilleUser.solde_initial)
+  },
+  ...capital_history
+];
+
+
+return res.status(200).json({success: true , capitalEvolution})
+
+
+}
+
+export async function getPnl(req , res) {
+  const userId = req.user.id;
+  const { period } = req.query;
+  const startDate = getStartDateByPeriod(period);
+
+
+  const trades = await prisma.trade.findMany({
+    where: {
+      userId,
+      status: 'CLOSED',
+      closedAt: { gte: startDate }
+    }
+  });
+
+  if (!trades || trades.length === 0) {
+  return res.status(200).json({ success: true, totalPNL: 0, averagePNL: 0, message: 'Aucun trade trouvé' });
+}
+
+const pnlTotal = trades.reduce((acc , trade) => acc + trade.result, 0);
+
+return res.status(200).json({success: true , pnlTotal: Number(pnlTotal.toFixed(2))});
+}
+
+
+export async function getRewardRisk(req , res) {
+  const userId = req.user.id;
+  const {period} = req.query
+
+  const startDate = getStartDateByPeriod(period);
+
+  const trades = await prisma.trade.findMany({
+    where: {
+      userId,
+      status: 'CLOSED',
+      closedAt: {gte: startDate}
+    },
+  });
+
+  if (trades.length === 0 || !trades) {
+    return res.status(200).json({success: true , message: `Aucuns trade fermer ou appartenant à l'utilisateur.`});
+  }
+
+ const tradeValide = trades.filter((trade) => trade.risk_amount > 0);
+
+if (!tradeValide) {
+  return res.status(404).json({error: 'erreur zeub'})
+}
+ 
+const rMultiple = tradeValide.map(trade => trade.result / trade.risk_amount);
+
+const sumRMultiple = rMultiple.reduce((acc, val) => acc + val, 0);
+const averageRR = Number((sumRMultiple / tradeValide.length).toFixed(2));
+
+
+
+
+  return res.status(200).json({success: true , rewardRisk: averageRR})
+}
+
+
+
+export async function getPnlChart(req, res) {
+  const userId = req.user.id;
+  const { period } = req.query;
+
+  const startDate = getStartDateByPeriod(period);
+
+  try {
+    const capitalHistory = await prisma.capital_history.findMany({
+      where: {
+        userId,
+        createdAt: { gte: startDate },
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+      select: {
+        createdAt: true,
+        variation: true,
+      },
+    });
+
+    if (!capitalHistory || capitalHistory.length === 0) {
+      return res.status(200).json({ message: "Aucune variation trouvée !" });
+    }
+
+    const result = capitalHistory.map(item => ({
+      date: new Date(item.createdAt).toLocaleDateString('fr-FR', {
+        day: '2-digit',
+        month: '2-digit',
+      }),
+      pnl: Number(item.variation),
+    }));
+
+    return res.status(200).json({ success: true, pnlVariations: result });
+  } catch (error) {
+    console.error("Erreur getPnlChart:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
+  }
 }

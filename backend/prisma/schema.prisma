@@ -32,7 +32,8 @@ model Trade {
   takeProfit       Float?
   size_lot         Float?
   result           Float?
-  ratio_risk       Float?
+  risk_amount      Float
+  r_multiple       Float? 
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
   closedAt         DateTime?

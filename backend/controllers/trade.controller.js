@@ -5,7 +5,7 @@ const VALID_DIRECTIONS = ['LONG', 'SHORT'];
 
 export async function createTrade(req, res) {
   const userId = req.user.id;
-  let {status,direction,paire,ratio_risk,result,size_lot,takeProfit,stopLoss,exitPrice,entryPrice} = req.body;
+  let {status,direction,paire,risk_amount,result,size_lot,takeProfit,stopLoss,exitPrice,entryPrice} = req.body;
 
   status = 'OPEN';
 
@@ -20,7 +20,7 @@ export async function createTrade(req, res) {
         status,
         direction,
         paire,
-        ratio_risk: ratio_risk ?? null,
+        risk_amount: size_lot ?? null,
         size_lot: size_lot ?? null,
         entryPrice,
         takeProfit: takeProfit ?? null,
@@ -39,7 +39,7 @@ export async function createTrade(req, res) {
 export async function updateTrade(req, res) {
   const userId = req.user.id;
   const tradeId = Number(req.params.id);
-  const {status,direction,paire,ratio_risk,result,size_lot,takeProfit,stopLoss,exitPrice,entryPrice} = req.body;
+  const {status,direction,paire,risk_amount,result,size_lot,takeProfit,stopLoss,exitPrice,entryPrice} = req.body;
 
   try {
     const tradeById = await prisma.trade.findUnique({ where: { id: tradeId } });
@@ -158,7 +158,7 @@ export async function updateTrade(req, res) {
         direction: direction ?? tradeById.direction,
         paire: paire ?? tradeById.paire,
         entryPrice: entryPrice ?? tradeById.entryPrice,
-        ratio_risk: ratio_risk ?? tradeById.ratio_risk,
+        risk_amount: risk_amount ?? tradeById.risk_amount,
         size_lot: size_lot ?? tradeById.size_lot,
         takeProfit: takeProfit ?? tradeById.takeProfit,
         stopLoss: stopLoss ?? tradeById.stopLoss,
@@ -222,7 +222,7 @@ export async function deleteTradeById(req , res) {
   await prisma.trade.delete({where:{id: tradeId}});
 
 
-  res.status(200).json({success: true , })
+  return res.status(200).json({success: true , })
 }
 
 
@@ -256,6 +256,32 @@ export async function getTradeById(req , res) {
     return res.status(403).json({error: 'Accès non autorisé pour ce trade !'})
   }
 
-  res.status(200).json({success: true , trade: tradeById});
+  return res.status(200).json({success: true , trade: tradeById});
 }
 
+export async function getLastTrade(req , res) {
+  const userId = req.user.id;
+
+  const lastTrades = await prisma.trade.findMany({
+    where:{
+      userId , 
+      status: 'CLOSED'
+    },
+    orderBy: {
+      closedAt: 'desc'
+    },
+    take: 7,
+    select: {
+      id: true, 
+      createdAt: true,
+      closedAt: true,
+      paire: true,
+      direction: true,
+      result: true,
+      risk_amount: true,
+      status: true
+    }
+  });
+
+  return res.status(200).json({success: true , lastTrades})
+}
