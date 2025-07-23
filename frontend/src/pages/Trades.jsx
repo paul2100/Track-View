@@ -218,8 +218,8 @@ useEffect(() => {
 
         <div className='my-5 py-5 w-full shadow-xs rounded-lg grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6'>
           <CardStatsTrades title={'Average time of a trade'} stats={averageStats || '0'} icons={Hourglass} />
-          <CardStatsTrades title={'Success rate'} stats={succesRateStats + '%'} icons={Percent}/>
-          <CardStatsTrades title={'Total trade'} stats={allTradesStats} icons={Calculator}/>
+          <CardStatsTrades title={'WinRate %'} stats={succesRateStats + '%'} icons={Percent}/>
+          <CardStatsTrades title={'Total trade closed'} stats={allTradesStats} icons={Calculator}/>
           <CardStatsTrades title={'Drawdown max'} stats={drawdownStats ? '-' + drawdownStats : '0'} icons={MoveDownRight}/>
           <CardStatsTrades title={'Winning trade'} stats={winTradeTotalStats || '0'} icons={MoveUpRight}/>
           <CardStatsTrades title={'The biggest gain'} stats={bestTradeStats || '0'} icons={CircleDollarSign}/>

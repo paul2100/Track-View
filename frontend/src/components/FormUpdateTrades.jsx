@@ -8,7 +8,7 @@ function FormUpdateTrades({ tradeId , onSuccess }) {
     status: '',
     direction: '',
     paire: '',
-    ratio_risk: '',
+    risk_amount: '',
     size_lot: '',
     entryPrice: '',
     takeProfit: '',
@@ -28,7 +28,7 @@ function FormUpdateTrades({ tradeId , onSuccess }) {
               status: res.data.trade.status || '',
               direction: res.data.trade.direction || '',
               paire: res.data.trade.paire || '',
-              ratio_risk: res.data.trade.ratio_risk || '',
+              risk_amount: res.data.trade.risk_amount || '',
               size_lot: res.data.trade.size_lot || '',
               entryPrice: res.data.trade.entryPrice || '',
               takeProfit: res.data.trade.takeProfit || '',
@@ -66,7 +66,7 @@ function FormUpdateTrades({ tradeId , onSuccess }) {
     takeProfit: form.takeProfit === "" ? null : parseFloat(form.takeProfit),
     stopLoss: form.stopLoss === "" ? null : parseFloat(form.stopLoss),
     size_lot: form.size_lot === "" ? null : parseFloat(form.size_lot),
-    ratio_risk: form.ratio_risk === "" ? null : parseFloat(form.ratio_risk),
+    risk_amount: form.risk_amount === "" ? null : parseFloat(form.risk_amount),
   };
 
   axios.patch(`http://localhost:3000/api/trade/updateTrade/${tradeId}`, dataToSend, { withCredentials: true })
@@ -198,28 +198,32 @@ function FormUpdateTrades({ tradeId , onSuccess }) {
   </div>
 
   <div className="flex flex-col">
-    <label htmlFor="ratio_risk" className="mb-1 font-semibold text-gray-700">Risk Ratio</label>
+    <label htmlFor="risk_amount" className="mb-1 font-semibold text-gray-700">Risk amount</label>
     <input
       type="number"
-      id="ratio_risk"
-      name="ratio_risk"
-      value={form.ratio_risk}
+      id="risk_amount"
+      name="risk_amount"
+      value={form.risk_amount}
       onChange={handleChange}
       className="border border-gray-300 px-4 py-2 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 transition"
     />
   </div>
 
   <div className="flex flex-col">
-    <label htmlFor="result" className="mb-1 font-semibold text-gray-700">Result</label>
-    <input
-      type="number"
-      id="result"
-      name="result"
-      value={form.result}
-      onChange={handleChange}
-      className="border border-gray-300 px-4 py-2 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 transition"
-    />
-  </div>
+  <label htmlFor="result" className="mb-1 font-semibold text-gray-700">Result</label>
+  <input
+    type="number"
+    id="result"
+    name="result"
+    value={form.result}
+    disabled={form.status === 'CLOSED'}
+    onChange={handleChange}
+    className="border border-gray-300 px-4 py-2 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 transition"/>
+  {form.status === 'CLOSED' && (
+    <p className="text-sm text-gray-500 mt-1">Ce trade est clôturé. Le résultat ne peut pas être modifié veuillez le passer a open pour modifier.</p>
+  )}
+</div>
+
 
   <button
     type="submit"

@@ -81,7 +81,7 @@ function CardTrades({ trade, onUpdate , onDelete }) {
           <div><p className="text-gray-500">Take Profit</p><p>{trade.takeProfit}</p></div>
           <div><p className="text-gray-500">Lot Size</p><p>{trade.size_lot}</p></div>
           <div><p className="text-gray-500">Result</p><p>{trade.result ?? '—'}</p></div>
-          <div><p className="text-gray-500">Risk Ratio</p><p>{trade.ratio_risk}</p></div>
+          <div><p className="text-gray-500">Risk amount</p><p>{trade.risk_amount}</p></div>
           <div><p className="text-gray-500">Status</p><p>{trade.status}</p></div>
           <div><p className="text-gray-500">Direction</p><p>{trade.direction}</p></div>
         </div>

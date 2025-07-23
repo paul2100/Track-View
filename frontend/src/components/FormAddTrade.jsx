@@ -10,7 +10,7 @@ function FormAddTrade({onSuccess}) {
     status: '',
     direction: '',
     paire: '',
-    ratio_risk: '',
+    risk_amount: '',
     size_lot: '',
     entryPrice: '',
     takeProfit: '',
@@ -39,13 +39,6 @@ function FormAddTrade({onSuccess}) {
         newErrors.takeProfit = "Le take profit doit être supérieur au prix d'entrée.";
       }
     }
-    if (form.ratio_risk) {
-      const ratio = parseFloat(form.ratio_risk);
-      if (isNaN(ratio)) newErrors.ratio_risk = "Ratio risque invalide.";
-      else if (ratio < 0.1 || ratio > 10) {
-        newErrors.ratio_risk = "Le ratio risque doit être entre 0.1 et 10.";
-      }
-    }
     if (!form.size_lot) newErrors.size_lot = "La taille du lot est obligatoire.";
     else if (isNaN(parseFloat(form.size_lot))) newErrors.size_lot = "Taille du lot invalide.";
 
@@ -68,7 +61,7 @@ function FormAddTrade({onSuccess}) {
       stopLoss: form.stopLoss ? parseFloat(form.stopLoss) : null,
       takeProfit: form.takeProfit ? parseFloat(form.takeProfit) : null,
       size_lot: parseFloat(form.size_lot),
-      ratio_risk: form.ratio_risk ? parseFloat(form.ratio_risk) : null,
+      risk_amount: form.risk_amount ? parseFloat(form.risk_amount) : null,
       result: form.result ? parseFloat(form.result) : null,
     };
 
@@ -218,17 +211,16 @@ function FormAddTrade({onSuccess}) {
       </div>
 
       <div className="flex flex-col">
-        <label htmlFor="ratio_risk" className="mb-1 font-semibold text-gray-700">Risk Ratio</label>
+        <label htmlFor="risk_amount" className="mb-1 font-semibold text-gray-700">Risk amount</label>
         <input
           type="number"
-          id="ratio_risk"
-          name="ratio_risk"
-          value={form.ratio_risk}
+          id="risk_amount"
+          name="risk_amount"
+          value={form.risk_amount}
           onChange={handleChange}
-          placeholder="Ratio risque"
+          placeholder="Risk amount"
           className="border border-gray-300 px-4 py-2 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-1 focus:ring-offset-white transition"
         />
-        {errors.ratio_risk && <p className="text-red-600 text-sm mt-1">{errors.ratio_risk}</p>}
       </div>
 
       <div className="flex flex-col">
