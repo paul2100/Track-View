@@ -69,6 +69,7 @@ useEffect(() => {
     .then(res => {
       if (res.status === 200) {
         setRiskRewardStats(res.data.rewardRisk);
+        console.log(res.data.rewardRisk)
       }
     })
     .catch(err => {
@@ -152,7 +153,7 @@ useEffect(() => {
           <CardStats title="Capital" value={capital_actuel} img='/src/assets/icon.svg' />
           <CardStats title="Total trade closed" value={allTradesStats} img='/src/assets/icon.svg' />
           <CardStats title="PNL net" value={pnLStats || '0'} img='/src/assets/icon.svg' />
-          <CardStats title="Risk/Reward" value={riskRewardStats + '%'} img='/src/assets/icon.svg' />
+          <CardStats title="Risk/Reward" value={`${riskRewardStats ?? 0}%`} img='/src/assets/icon.svg' />
         </div>
 
 
@@ -171,7 +172,7 @@ useEffect(() => {
                 <th className="md:py-2 py-1 px-1">Closing date</th>
                 <th className="md:py-2 py-1 px-1">Pair</th>
                 <th className="md:py-2 py-1 px-1">Direction</th>
-                <th className="md:py-2 py-1 px-1">Result</th>
+                <th className="md:py-2 py-1 px-1">Net Result</th>
                 <th className="md:py-2 py-1 px-1">Status</th>
               </tr>
             </thead>

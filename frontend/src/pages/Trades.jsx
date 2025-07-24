@@ -11,7 +11,7 @@ import CardStatsTrades from '../components/CardStatsTrades.jsx';
 import { BarChart3 , Hourglass , CircleDollarSign , MoveDownRight, Percent , MoveUpRight , Calculator} from 'lucide-react';
 
 
-function Trades({tradeId}) {
+function Trades() {
   const [allTrades, setAllTrades] = useState([]);
   const [selectedTradeId, setSelectedTradeId] = useState(null);
   const [createFormOpen, setCreateFormOpen] = useState(false);
@@ -175,7 +175,7 @@ useEffect(() => {
   }, [location.state]);
 
   return (
-    <div className="flex">
+    <div className="flex relative">
       <Sidebar />
       <main className="md:ml-[260px] p-6 flex-1 bg-gray-50 min-h-screen">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center mt-5 rounded-md mb-6">
@@ -207,12 +207,10 @@ useEffect(() => {
             <button onClick={() => setCreateFormOpen(false)} className="text-red-500 font-semibold cursor-pointer mb-4">
               Close
             </button>
-            <FormAddTrade
-              onSuccess={() => {
-                fetchTrades();
-                setCreateFormOpen(false);
-              }}
-            />
+            <FormAddTrade onSuccess={() => 
+              {fetchTrades(); 
+              setCreateFormOpen(false);
+            }}/>
           </div>
         )}
 
