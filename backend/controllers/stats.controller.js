@@ -1,5 +1,5 @@
 import prisma from '../prisma/client.js';
-import { getStartDateByPeriod } from '../utils.js';
+import { getStartDateByPeriod, getEndDateByPeriod } from '../utils.js';
 
 export async function getAverageTimeTrade(req, res) {
   const userId = req.user.id;
@@ -46,6 +46,7 @@ export async function getSuccesRate(req, res) {
   const userId = req.user.id;
   const { period } = req.query;
   const startDate = getStartDateByPeriod(period);
+  const endDate = getEndDateByPeriod(period);
 
   try {
     const trades = await prisma.trade.findMany({
@@ -54,6 +55,7 @@ export async function getSuccesRate(req, res) {
         status: 'CLOSED',
         closedAt: {
           gte: startDate,
+          lte: endDate,
         },
       },
     });
@@ -79,14 +81,18 @@ export async function getTotalTrades(req, res) {
   const userId = req.user.id;
   const { period } = req.query;
   const startDate = getStartDateByPeriod(period);
+  const endDate = getEndDateByPeriod(period);
 
   try {
     const totalTrade = await prisma.trade.count({
       where: {
         userId,
         status: 'CLOSED',
-        closedAt: { gte: startDate }
-      }
+        closedAt: { 
+          gte: startDate,
+          lte: endDate,
+        },
+      },
     });
 
     return res.status(200).json({ success: true, totalTrade });
@@ -102,6 +108,7 @@ export async function getMaxDrawdown(req, res) {
   const userId = req.user.id;
   const { period } = req.query;
   const startDate = getStartDateByPeriod(period);
+  const endDate = getEndDateByPeriod(period);
 
   if (!startDate) {
     return res.status(400).json({ error: "Période invalide (week, month, year)" });
@@ -112,7 +119,10 @@ export async function getMaxDrawdown(req, res) {
       where: {
         userId,
         status: 'CLOSED',
-        closedAt: { gte: startDate }
+        closedAt: { 
+          gte: startDate,
+          lte: endDate,
+        },
       },
       orderBy: { closedAt: 'asc' }
     });
@@ -146,13 +156,17 @@ export async function getWinTrade(req, res) {
   const userId = req.user.id;
   const { period } = req.query;
   const startDate = getStartDateByPeriod(period);
+  const endDate = getEndDateByPeriod(period);
 
   const trades = await prisma.trade.findMany({
     where: {
       userId,
       status: 'CLOSED',
-      closedAt: { gte: startDate }
-    }
+      closedAt: { 
+        gte: startDate,
+        lte: endDate,
+      },
+    },
   });
 
   if (!trades || trades.length === 0) {
@@ -170,13 +184,17 @@ export async function getLossTrade(req, res) {
   const userId = req.user.id;
   const { period } = req.query;
   const startDate = getStartDateByPeriod(period);
+  const endDate = getEndDateByPeriod(period);
 
   const trades = await prisma.trade.findMany({
     where: {
       userId,
       status: 'CLOSED',
-      closedAt: { gte: startDate }
-    }
+      closedAt: { 
+        gte: startDate,
+        lte: endDate,
+      },
+    },
   });
 
   if (!trades || trades.length === 0) {
@@ -194,13 +212,17 @@ export async function getMaxWin(req, res) {
   const userId = req.user.id;
   const { period } = req.query;
   const startDate = getStartDateByPeriod(period);
+  const endDate = getEndDateByPeriod(period);
 
   const trades = await prisma.trade.findMany({
     where: {
       userId,
       status: 'CLOSED',
-      closedAt: { gte: startDate }
-    }
+      closedAt: { 
+        gte: startDate,
+        lte: endDate,
+      },
+    },
   });
 
   if (!trades || trades.length === 0) {
@@ -224,13 +246,17 @@ export async function getMaxLost(req, res) {
   const userId = req.user.id;
   const { period } = req.query;
   const startDate = getStartDateByPeriod(period);
+  const endDate = getEndDateByPeriod(period);
 
   const trades = await prisma.trade.findMany({
     where: {
       userId,
       status: 'CLOSED',
-      closedAt: { gte: startDate }
-    }
+      closedAt: { 
+        gte: startDate,
+        lte: endDate,
+      },
+    },
   });
 
   if (!trades || trades.length === 0) {
@@ -266,71 +292,75 @@ export async function getCapitalHistory(req , res) {
   }
   
   const capital_history = await prisma.capital_history.findMany({
-  where: {
-    userId,
-    trade: {
-      status: 'CLOSED' 
+    where: {
+      userId,
+      trade: {
+        status: 'CLOSED' 
+      }
+    },
+    orderBy: {
+      createdAt: 'asc'
+    },
+    select: {
+      createdAt: true,
+      capital: true
     }
-  },
-  orderBy: {
-    createdAt: 'asc'
-  },
-  select: {
-    createdAt: true,
-    capital: true
-  }
-});
+  });
 
+  const capitalEvolution = [
+    {
+      createdAt: portefeuilleUser.createdAt,
+      capital: Number(portefeuilleUser.solde_initial)
+    },
+    ...capital_history
+  ];
 
-const capitalEvolution = [
-  {
-    createdAt: portefeuilleUser.createdAt,
-    capital: Number(portefeuilleUser.solde_initial)
-  },
-  ...capital_history
-];
-
-
-return res.status(200).json({success: true , capitalEvolution})
-
-
+  return res.status(200).json({success: true , capitalEvolution});
 }
+
 
 export async function getPnl(req , res) {
   const userId = req.user.id;
   const { period } = req.query;
   const startDate = getStartDateByPeriod(period);
-
+  const endDate = getEndDateByPeriod(period);
 
   const trades = await prisma.trade.findMany({
     where: {
       userId,
       status: 'CLOSED',
-      closedAt: { gte: startDate }
-    }
+      closedAt: { 
+        gte: startDate,
+        lte: endDate,
+      },
+    },
   });
 
   if (!trades || trades.length === 0) {
-  return res.status(200).json({ success: true, totalPNL: 0, averagePNL: 0, message: 'Aucun trade trouvé' });
-}
+    return res.status(200).json({ success: true, totalPNL: 0, averagePNL: 0, message: 'Aucun trade trouvé' });
+  }
 
-const pnlTotal = trades.reduce((acc , trade) => acc + trade.result, 0);
+  const pnlTotal = trades.reduce((acc , trade) => acc + trade.result, 0);
 
-return res.status(200).json({success: true , pnlTotal: Number(pnlTotal.toFixed(2))});
+  return res.status(200).json({success: true , pnlTotal: Number(pnlTotal.toFixed(2))});
 }
 
 
 export async function getRewardRisk(req , res) {
   const userId = req.user.id;
-  const {period} = req.query
+  const {period} = req.query;
 
   const startDate = getStartDateByPeriod(period);
+  const endDate = getEndDateByPeriod(period);
 
   const trades = await prisma.trade.findMany({
     where: {
       userId,
       status: 'CLOSED',
-      closedAt: {gte: startDate}
+      closedAt: { 
+        gte: startDate,
+        lte: endDate,
+      },
     },
   });
 
@@ -338,23 +368,19 @@ export async function getRewardRisk(req , res) {
     return res.status(200).json({success: true , message: `Aucuns trade fermer ou appartenant à l'utilisateur.`});
   }
 
- const tradeValide = trades.filter((trade) => trade.risk_amount > 0);
+  const tradeValide = trades.filter((trade) => trade.risk_amount > 0);
 
-if (!tradeValide) {
-  return res.status(404).json({error: 'erreur zeub'})
+  if (!tradeValide || tradeValide.length === 0) {
+    return res.status(404).json({error: 'Aucun trade valide avec risk_amount > 0'});
+  }
+  
+  const rMultiple = tradeValide.map(trade => trade.result / trade.risk_amount);
+
+  const sumRMultiple = rMultiple.reduce((acc, val) => acc + val, 0);
+  const averageRR = Number((sumRMultiple / tradeValide.length).toFixed(2));
+
+  return res.status(200).json({success: true , rewardRisk: averageRR});
 }
- 
-const rMultiple = tradeValide.map(trade => trade.result / trade.risk_amount);
-
-const sumRMultiple = rMultiple.reduce((acc, val) => acc + val, 0);
-const averageRR = Number((sumRMultiple / tradeValide.length).toFixed(2));
-
-
-
-
-  return res.status(200).json({success: true , rewardRisk: averageRR})
-}
-
 
 
 export async function getPnlChart(req, res) {
@@ -362,32 +388,30 @@ export async function getPnlChart(req, res) {
   const { period } = req.query;
 
   const startDate = getStartDateByPeriod(period);
+  const endDate = getEndDateByPeriod(period);
 
   try {
-    const capitalHistory = await prisma.capital_history.findMany({
+    const trades = await prisma.trade.findMany({
       where: {
         userId,
-        createdAt: { gte: startDate },
-      },
-      orderBy: {
-        createdAt: 'asc',
-      },
-      select: {
-        createdAt: true,
-        variation: true,
+        status: 'CLOSED',
+        closedAt: { 
+          gte: startDate,
+          lte: endDate,
+        },
       },
     });
 
-    if (!capitalHistory || capitalHistory.length === 0) {
-      return res.status(200).json({ message: "Aucune variation trouvée !" });
+    if (!trades || trades.length === 0) {
+      return res.status(200).json({ message: "Aucuns résultats trouvés !" });
     }
 
-    const result = capitalHistory.map(item => ({
-      date: new Date(item.createdAt).toLocaleDateString('fr-FR', {
+    const result = trades.map(item => ({
+      date: new Date(item.closedAt).toLocaleDateString('fr-FR', {
         day: '2-digit',
         month: '2-digit',
       }),
-      pnl: Number(item.variation),
+      pnl: Number(item.result),
     }));
 
     return res.status(200).json({ success: true, pnlVariations: result });

@@ -20,7 +20,7 @@ export async function createTrade(req, res) {
         status,
         direction,
         paire,
-        risk_amount: size_lot ?? null,
+        risk_amount: risk_amount ?? null,
         size_lot: size_lot ?? null,
         entryPrice,
         takeProfit: takeProfit ?? null,
@@ -30,7 +30,7 @@ export async function createTrade(req, res) {
       },
     });
 
-    return res.status(200).json({ success: true, trade });
+    return res.status(200).json({ success: true, trade , id: trade.id});
   } catch (error) {
     return res.status(500).json({ error: "Erreur serveur lors de la création du trade." });
   }
@@ -284,4 +284,30 @@ export async function getLastTrade(req , res) {
   });
 
   return res.status(200).json({success: true , lastTrades})
+}
+
+
+export async function getTradeClosedNoJournal(req, res) {
+  const userId = req.user.id;
+
+  try {
+    const trades = await prisma.trade.findMany({
+      where: {
+        userId,
+        status: 'CLOSED',
+        tradeJournals: null
+      },
+      select: {
+        id: true,
+        paire: true,
+        closedAt: true,
+        status: true
+      }
+    });
+
+    return res.status(200).json({ success: true, tradeclosedNoJournal: trades });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: 'Erreur serveur' });
+  }
 }

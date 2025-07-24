@@ -71,8 +71,6 @@ model Trade_journal {
   id                    Int                @id @default(autoincrement())
   userId                Int
   tradeId               Int                @unique
-  screenshot_before_Url String?
-  screenshot_after_Url  String?
   plan_trade            String?
   emotions              String?
   indicators            String?
