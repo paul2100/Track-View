@@ -87,6 +87,7 @@ model Trade_screenshot {
   userId          Int
   tradeId         Int
   Trade_journalId Int
+  publicId        String
   screenshotUrl   String
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
