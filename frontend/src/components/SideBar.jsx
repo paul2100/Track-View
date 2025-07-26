@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import icon from '/src/assets/icon.svg';
+
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -38,7 +40,7 @@ function Sidebar() {
     <aside className="md:w-65 hidden h-screen fixed top-0 left-0 bg-gray-50 shadow-lg border-r border-r-stone-300 z-40 md:flex flex-col justify-between">
       <div className="border-b border-b-stone-300 flex items-center px-5 py-3 bg-gradient-to-r from-red-100 to-white">
         <div className="p-1 bg-red-200 rounded-lg">
-          <img src="src/assets/icon.svg" alt="Logo" className="h-8 w-8" />
+          <img src={icon} alt="Logo" className="h-8 w-8" />
         </div>
         <div className="ml-2 flex flex-col leading-tight">
           <h2 className="text-lg font-semibold">

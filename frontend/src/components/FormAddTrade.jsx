@@ -33,12 +33,6 @@ function FormAddTrade({onSuccess}) {
     if (!form.status) newErrors.status = "Le statut est obligatoire.";
     if (!form.entryPrice) newErrors.entryPrice = "Le prix d'entrée est obligatoire.";
     else if (isNaN(parseFloat(form.entryPrice))) newErrors.entryPrice = "Prix d'entrée invalide.";
-    if (form.takeProfit) {
-      if (isNaN(parseFloat(form.takeProfit))) newErrors.takeProfit = "Take profit invalide.";
-      else if (parseFloat(form.takeProfit) <= parseFloat(form.entryPrice)) {
-        newErrors.takeProfit = "Le take profit doit être supérieur au prix d'entrée.";
-      }
-    }
     if (!form.size_lot) newErrors.size_lot = "La taille du lot est obligatoire.";
     else if (isNaN(parseFloat(form.size_lot))) newErrors.size_lot = "Taille du lot invalide.";
 
