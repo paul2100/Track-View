@@ -148,6 +148,7 @@ useEffect(() => {
 
 
   const handleDelete = (tradeId) => {
+  if (window.confirm('Êtes-vous sûr de vouloir supprimer ce Trade ?')) {
   axios.delete(`http://localhost:3000/api/trade/deleteTradeById/${tradeId}`, { withCredentials: true })
     .then((res) => {
       if (res.status === 200) {
@@ -160,7 +161,7 @@ useEffect(() => {
       const message = err.response?.data?.error || "Erreur lors de la suppression du trade";
       toast.error(message);
     });
-};
+}};
 
 
   useEffect(() => {
@@ -204,7 +205,7 @@ useEffect(() => {
 
         {createFormOpen && (
           <div className='fixed top-0 right-0 h-full md:w-[400px] w-full bg-white z-50 shadow-xl overflow-y-auto p-6'>
-            <button onClick={() => setCreateFormOpen(false)} className="text-red-500 font-semibold cursor-pointer mb-4">
+            <button onClick={() => setCreateFormOpen(false)} className="text-rose-500 cursor-pointer border border-red-600 px-4 py-1 rounded-lg bg-rose-100 hover:bg-red-600 hover:text-white duration-300">
               Close
             </button>
             <FormAddTrade onSuccess={() => 
@@ -253,7 +254,7 @@ useEffect(() => {
 
         {selectedTradeId && (
           <div className="fixed top-0 right-0 h-full w-[400px] bg-white z-50 shadow-xl overflow-y-auto p-6">
-            <button onClick={() => setSelectedTradeId(null)} className="text-red-500 font-semibold cursor-pointer mb-4">
+            <button onClick={() => setSelectedTradeId(null)} className="text-rose-500 cursor-pointer border border-red-600 px-4 py-1 rounded-lg bg-rose-100 hover:bg-red-600 hover:text-white duration-300">
               Close
             </button>
             <FormUpdateTrades
