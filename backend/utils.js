@@ -39,7 +39,7 @@ export function getEndDateByPeriod(period) {
     }
     case 'month': {
       const firstDayNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-      const lastDayMonth = new Date(firstDayNextMonth - 1); // le jour avant le premier jour du mois suivant
+      const lastDayMonth = new Date(firstDayNextMonth - 1);
       lastDayMonth.setHours(23, 59, 59, 999);
       return lastDayMonth;
     }

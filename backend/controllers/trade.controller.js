@@ -1,4 +1,6 @@
 import prisma from '../prisma/client.js';
+import { getStartDateByPeriod, getEndDateByPeriod } from '../utils.js';
+
 
 const VALID_STATUS = ['OPEN', 'CLOSED', 'CANCELLED'];
 const VALID_DIRECTIONS = ['LONG', 'SHORT'];
@@ -226,21 +228,40 @@ export async function deleteTradeById(req , res) {
 }
 
 
-export async function getAllTrades(req , res) {
+export async function getAllTrades(req, res) {
   const userId = req.user.id;
+  const { period } = req.query;
 
   try {
-    const allTrades = await prisma.trade.findMany({ where: { userId } });
-    
-    if (allTrades.length === 0) {
-      return res.status(200).json({ success: true, allTrades: [] });
+    let dateFilter = {};
+    if (period) {
+      const startDate = getStartDateByPeriod(period);
+
+      dateFilter = {
+        OR: [
+        { closedAt: { gte: getStartDateByPeriod(period) } },
+        { closedAt: null }
+      ]
+      };
     }
+
+    const allTrades = await prisma.trade.findMany({ 
+      where: { 
+        userId,
+        ...dateFilter
+      },
+      orderBy: {
+        createdAt: 'desc',
+      }
+    });
 
     res.status(200).json({ success: true, allTrades });
   } catch (error) {
+    console.error(error);
     return res.status(500).json({ error: 'Erreur serveur' });
   }
 }
+
 
 export async function getTradeById(req , res) {
   const userId = req.user.id;
@@ -301,6 +322,7 @@ export async function getTradeClosedNoJournal(req, res) {
         id: true,
         paire: true,
         closedAt: true,
+        result: true,
         status: true
       }
     });

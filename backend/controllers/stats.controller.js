@@ -400,6 +400,9 @@ export async function getPnlChart(req, res) {
           lte: endDate,
         },
       },
+      orderBy: {
+      createdAt: 'asc'
+      },
     });
 
     if (!trades || trades.length === 0) {
@@ -418,5 +421,48 @@ export async function getPnlChart(req, res) {
   } catch (error) {
     console.error("Erreur getPnlChart:", error);
     return res.status(500).json({ error: "Erreur serveur" });
+  }
+}
+
+
+export async function getTradeClosedByDay(req , res) {
+  const userId = req.user.id;
+  const grouped = {};
+
+  try {
+  const tradeClosed = await prisma.trade.findMany({
+    where: {
+      userId,
+      status: 'CLOSED'
+    },
+    select: {
+      id: true,
+      result: true, 
+      closedAt: true,
+      size_lot: true,
+    },
+  });
+
+  if (!tradeClosed || tradeClosed.length === 0) {
+    return res.status(404).json({error: 'Aucuns trades trouvé !'});
+  }
+
+  for (let i = 0 ; i < tradeClosed.length ; i++ ) {
+    const date = tradeClosed[i].closedAt.toLocaleDateString();
+
+    if (!grouped[date]) {
+      grouped[date] = {sum: 0 , count: 0};
+    }
+
+    grouped[date].sum += tradeClosed[i].result;
+    grouped[date].count += 1;
+  }
+
+
+
+  return res.status(200).json({success: true , grouped});
+  } catch (error) {
+    console.error("Erreur tradeClosed :", error);
+    res.status(500).json({error: 'Erreur serveur.'});
   }
 }

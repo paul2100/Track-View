@@ -1,6 +1,6 @@
 import express from 'express';
 import { authenticateToken } from '../middlewares/authenticateToken.js';
-import {getAverageTimeTrade , getSuccesRate , getTotalTrades , getMaxDrawdown , getLossTrade , getWinTrade , getMaxLost , getMaxWin , getCapitalHistory , getPnl , getRewardRisk , getPnlChart} from '../controllers/stats.controller.js';
+import {getAverageTimeTrade , getSuccesRate , getTotalTrades , getMaxDrawdown , getLossTrade , getWinTrade , getMaxLost , getMaxWin , getCapitalHistory , getPnl , getRewardRisk , getPnlChart , getTradeClosedByDay} from '../controllers/stats.controller.js';
 
 const router = express.Router();
 
@@ -16,6 +16,8 @@ router.get('/getCapitalHistory', authenticateToken,  getCapitalHistory);
 router.get('/getPnl', authenticateToken,  getPnl);
 router.get('/getRewardRisk', authenticateToken,  getRewardRisk);
 router.get('/getPnlChart', authenticateToken,  getPnlChart);
+router.get('/getTradeClosedByDay', authenticateToken,  getTradeClosedByDay);
+
 
 
 export default router;

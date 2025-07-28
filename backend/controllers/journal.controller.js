@@ -1,6 +1,7 @@
 import cloudinary from '../utils/cloudinary.js';
 import prisma from '../prisma/client.js';
 import fs from 'fs';
+import { getStartDateByPeriod, getEndDateByPeriod } from '../utils.js';
 
 
 // cree un journal de trading 
@@ -212,9 +213,20 @@ export async function updateJournalById(req, res) {
 export async function getAllJournaux(req, res) {
   const userId = req.user.id;
 
+  const { period } = req.query;
+
+  const startDate = getStartDateByPeriod(period);
+  
+
   try {
     const allJournaux = await prisma.trade_journal.findMany({
-      where: { userId },
+      where: { 
+        userId,
+        createdAt: { 
+          gte: startDate,
+        },
+      },
+
       include: {
         trade: {
           select: {
