@@ -137,6 +137,7 @@ useEffect(() => {
       .then((res) => {
         if (res.status === 200) {
           setAllTrades(res.data.allTrades);
+          console.log(res.data.allTrades);
         } else {
           console.error('Erreur inattendue lors de la récupération des trades');
         }

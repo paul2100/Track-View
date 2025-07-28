@@ -23,7 +23,7 @@ function CardJournal({ journal, VoirPlus , onDelete , onEdit}) {
 
           <div className="relative">
             <button onClick={() => setMenuOpen(!menuOpen)} className="p-1">
-              <img src="/src/assets/three-point.svg" alt="menu" className='h-5 w-5 cursor-pointer' />
+              <img src="/src/assets/three-point.png" alt="menu" className='h-5 w-5 cursor-pointer rotate-90' />
             </button>
 
             {menuOpen && (
