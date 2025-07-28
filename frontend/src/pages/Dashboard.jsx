@@ -124,26 +124,21 @@ useEffect(() => {
   return (
     <div className="flex relative">
       <Sidebar />
-      <main className="md:ml-[260px] flex-1 p-6 bg-gray-50 min-h-screen">
+      <main className="md:ml-[260px] flex-1 p-6 bg-black min-h-screen">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center mt-5 rounded-md mb-6">
           <div className="mb-4 md:mb-0">
-            <h1 className="md:text-4xl text-2xl font-semibold">Dashboard</h1>
-            <span className="text-gray-500 text-base">
+            <h1 className="md:text-4xl text-white text-2xl font-semibold">Dashboard</h1>
+            <span className="text-gray-400 text-base">
               Welcome back! Here's your activity overview.
             </span>
           </div>
 
           <div className="w-full md:w-auto flex md:flex-row-reverse flex-col md:items-center md:justify-center">
-            <button
-              className="w-full md:w-auto bg-orange-500 text-white py-2 px-6 rounded-md hover:bg-orange-600 transition cursor-pointer"
-            >
-              + Create
-            </button>
 
             <div className="md:mr-5 md:mt-0 mt-10">
-              <button onClick={() => setPeriod('week')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-black/40 text-black/50 hover:scale-110 hover:shadow-orange-500 duration-300 ${period === 'week' ? 'text-orange-400' : ''}`}>Week</button>
-              <button onClick={() => setPeriod('month')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-black/40 text-black/50 hover:scale-110 hover:shadow-orange-500 duration-300 ${period === 'month' ? 'text-orange-400' : ''}`}>Month</button>
-              <button onClick={() => setPeriod('year')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-black/40 text-black/50 hover:scale-110 hover:shadow-orange-500 duration-300 ${period === 'year' ? 'text-orange-400' : ''}`}>Year</button>
+              <button onClick={() => setPeriod('week')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-black/40  hover:scale-105  duration-300 ${period === 'week' ? 'text-orange-400 border border-orange-400 shadow-orange-400' : 'text-gray-200 border border-white shadow-white'}`}>Week</button>
+              <button onClick={() => setPeriod('month')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-black/40  hover:scale-105 duration-300 ${period === 'month' ? 'text-orange-400 border border-orange-400 shadow-orange-400' : 'text-gray-200 border border-white shadow-white'}`}>Month</button>
+              <button onClick={() => setPeriod('year')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-black/40  hover:scale-105  duration-300 ${period === 'year' ? 'text-orange-400 border border-orange-400 shadow-orange-400' : 'text-gray-200 border border-white shadow-white'}`}>Year</button>
             </div>
           </div>
         </div>
@@ -165,30 +160,35 @@ useEffect(() => {
         </div>
 
 
-        <div className="w-full mt-8">
-          <table className="w-full text-black md:text-sm text-xs">
+        <div className="w-full mt-8 border border-orange-400/50 rounded-lg overflow-hidden shadow-sm shadow-orange-500/80">
+          <table className="w-full md:text-sm text-xs">
             <thead>
-              <tr className="shadow-sm shadow-orange-500/40 rounded-lg">
-                <th className="md:py-2 py-1 px-1">Closing date</th>
-                <th className="md:py-2 py-1 px-1">Pair</th>
-                <th className="md:py-2 py-1 px-1">Direction</th>
-                <th className="md:py-2 py-1 px-1">Net Result</th>
-                <th className="md:py-2 py-1 px-1">Status</th>
+              <tr className="bg-gray-500/30">
+                <th className="md:py-2 py-1 px-1 text-white">Closing date</th>
+                <th className="md:py-2 py-1 px-1 text-white">Pair</th>
+                <th className="md:py-2 py-1 px-1 text-white">Direction</th>
+                <th className="md:py-2 py-1 px-1 text-white">Net Result</th>
+                <th className="md:py-2 py-1 px-1 text-white">Status</th>
               </tr>
             </thead>
             <tbody>
-              {lastTradeStats.map((trade) => (
-                <tr key={trade.id} className="text-center">
-                  <td className='py-2'>{new Date(trade.closedAt).toLocaleDateString()}</td>
-                  <td className='py-2'>{trade.paire}</td>
-                  <td className='py-2'>{trade.direction}</td>
-                  <td className='py-2'>{trade.result} €</td>
-                  <td className='py-2'>{trade.status}</td>
+              {lastTradeStats.map((trade, idx) => (
+                <tr
+                  key={trade.id}
+                  className={`text-center ${idx % 2 === 0 ? 'bg-gray-800/20' : ''}`}
+                >
+                  <td className='py-2 text-gray-200'>{new Date(trade.closedAt).toLocaleDateString()}</td>
+                  <td className='py-2 text-gray-200'>{trade.paire}</td>
+                  <td className='py-2 text-gray-200'>{trade.direction}</td>
+                  <td className='py-2 text-gray-200'>{trade.result} €</td>
+                  <td className='py-2 text-gray-200'>{trade.status}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+
+
 
 
         

@@ -42,8 +42,8 @@ function CapitalChart({ data }) {
         label: 'Capital',
         data: capitalValues,
         fill: false,
-        borderColor: 'orange',
-        backgroundColor: 'orange',
+        borderColor: '#f97316',
+        backgroundColor: '#f97316',
         borderWidth: 2,
         pointRadius: 3,
         pointHoverRadius: 5,
@@ -58,7 +58,7 @@ function CapitalChart({ data }) {
       title: {
       display: true,
       text: 'Evolution of capital',
-      color: 'black',
+      color: 'white',
       font: {
         size: 12,
         weight: 'bold',
@@ -76,23 +76,29 @@ function CapitalChart({ data }) {
       },
       tooltip: {
         titleColor: 'black',
-        bodyColor: 'gray',
+        bodyColor: 'black',
         backgroundColor: 'white',
       },
     },
     scales: {
       x: {
-        ticks: { color: 'black' },
+        ticks: { color: 'white' },
+        grid: {
+          color: 'rgba(255, 255, 255, 0.3)',
+        },        
       },
       y: {
         beginAtZero: true,
-        ticks: { color: 'black' },
+        ticks: { color: 'white' },
+        grid: {
+          color: 'rgba(255, 255, 255, 0.3)',
+        },
       },
     },
   };
 
   return (
-    <div className="md:w-[49%] w-full h-[340px] flex justify-center items-center border shadow-sm hover:shadow-md transition-shadow duration-200 border-stone-300 rounded-lg mt-5 md:mt-0 ">
+    <div className="md:w-[49%] w-full h-[340px] flex justify-center items-center border shadow-sm hover:shadow-md transition-all duration-500 hover:scale-102 bg-gray-200/10 border-stone-200/40 rounded-lg mt-5 md:mt-0 ">
       {hasData ? (
         <div className="w-full h-full p-4">
           <Line data={chartData} options={options} />

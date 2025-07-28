@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import Journal from './pages/Journal';
 import Trades from './pages/Trades';
 import PrivateRoute from './components/PrivateRoute';
+import Performance from './pages/Performance';
 
 
 
@@ -25,6 +26,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/journals" element={<Journal />} />
           <Route path="/trades" element={<Trades />} />
+          <Route path="/performance" element={<Performance />} />
         </Route>
 
       </Routes>

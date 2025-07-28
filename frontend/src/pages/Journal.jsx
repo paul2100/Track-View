@@ -24,7 +24,7 @@ function Journal() {
   };
 
   const fetchAllJournaux = () => {
-    axios.get('http://localhost:3000/api/journal/getAllJournaux', {withCredentials: true})
+    axios.get(`http://localhost:3000/api/journal/getAllJournaux?period=${period}`, {withCredentials: true})
     .then(res => {
       if (res.status === 200) {
         setAllJournaux(res.data.allJournaux);
@@ -36,7 +36,7 @@ function Journal() {
 
   useEffect(() => {
     fetchAllJournaux();
-  }, []);
+  }, [period]);
 
   const handleDelete = (id) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer ce journal ?')) {
@@ -63,10 +63,10 @@ function Journal() {
   return (
     <div className="flex relative">
       <Sidebar />
-      <main className="md:ml-[260px] p-6 flex-1 bg-white min-h-screen text-neutral-900">
+      <main className="md:ml-[260px] p-6 flex-1 bg-black min-h-screen text-neutral-900">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center mt-5 rounded-md mb-6">
           <div className="mb-4 md:mb-0">
-            <h1 className="md:text-4xl text-2xl font-semibold">Journals</h1>
+            <h1 className="md:text-4xl text-white text-2xl font-semibold">Journals</h1>
             <span className="text-gray-400 text-base">
               View all your trading journals on this page
             </span>
@@ -78,9 +78,9 @@ function Journal() {
             </button>
 
             <div className="md:mr-5 md:mt-0 mt-10">
-              <button onClick={() => setPeriod('week')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-orange-500/100 hover:scale-110 hover:shadow-orange-500 duration-300 ${period === 'week' ? 'text-orange-400 font-semibold' : ''}`}>Week</button>
-              <button onClick={() => setPeriod('month')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-orange-500/100 hover:scale-110 hover:shadow-orange-500 duration-300 ${period === 'month' ? 'text-orange-400 font-semibold' : ''}`}>Month</button>
-              <button onClick={() => setPeriod('year')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-orange-500/100 hover:scale-110 hover:shadow-orange-500 duration-300 ${period === 'year' ? 'text-orange-400 font-semibold' : ''}`}>Year</button>
+              <button onClick={() => setPeriod('week')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-black/40  hover:scale-105  duration-300 ${period === 'week' ? 'text-orange-400 border border-orange-400 shadow-orange-400' : 'text-gray-200 border border-white shadow-white'}`}>Week</button>
+              <button onClick={() => setPeriod('month')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-black/40  hover:scale-105 duration-300 ${period === 'month' ? 'text-orange-400 border border-orange-400 shadow-orange-400' : 'text-gray-200 border border-white shadow-white'}`}>Month</button>
+              <button onClick={() => setPeriod('year')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-black/40  hover:scale-105  duration-300 ${period === 'year' ? 'text-orange-400 border border-orange-400 shadow-orange-400' : 'text-gray-200 border border-white shadow-white'}`}>Year</button>
             </div>
           </div>
         </div>
@@ -125,7 +125,7 @@ function Journal() {
           </div>
         ) : (
           <div>
-            <h3 className="text-xl font-semibold text-black mb-4">
+            <h3 className="text-xl font-semibold text-gray-200 mb-4">
               <span className='text-orange-400'>A</span>ll newspapers
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

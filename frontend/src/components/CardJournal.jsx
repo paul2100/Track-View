@@ -13,10 +13,10 @@ function CardJournal({ journal, VoirPlus , onDelete , onEdit}) {
   });
 
   return (
-  <div className="group relative border bg-rose-100/70 border-rose-500 rounded-3xl overflow-hidden duration-500 transition-all cursor-pointer">
+  <div className="group relative border bg-gray-500/20 border-stone-300/20 rounded-3xl overflow-hidden duration-500 transition-all cursor-pointer">
       <div className='mx-3 my-4 flex justify-between items-center'>
         <div>
-            <h2 className="text-xl font-semibold tracking-tight">
+            <h2 className="text-xl text-white font-semibold tracking-tight">
               {trade.paire}
             </h2>
         </div>
@@ -27,11 +27,12 @@ function CardJournal({ journal, VoirPlus , onDelete , onEdit}) {
             </button>
 
             {menuOpen && (
-              <div className="absolute right-0 mt-2 w-32 bg-white border rounded shadow z-50 text-sm">
-                <button onClick={() => {setMenuOpen(false); onEdit(journal);}} className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+              <div className="absolute -bottom-3 right-7 w-32 bg-gray-500/30 border rounded shadow z-50 text-sm">
+                <button onClick={() => {setMenuOpen(false); onEdit(journal);}} className="block w-full text-center text-orange-500 px-4 py-[3px] hover:bg-gray-500/30 duration-300 cursor-pointer">
                   Update
                 </button>
-                <button onClick={() => {setMenuOpen(false); onDelete(journal.id);}}className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600">
+                <hr />
+                <button onClick={() => {setMenuOpen(false); onDelete(journal.id);}}className="block w-full text-center px-4 py-[3px] hover:bg-gray-500/30 text-red-600 duration-300 cursor-pointer">
                   Delete
                 </button>
               </div>
@@ -41,8 +42,7 @@ function CardJournal({ journal, VoirPlus , onDelete , onEdit}) {
 
       </div>
       {screenshotUrl ? (
-        <div className="overflow-hidden">
-          <img
+      <div className="overflow-hidden" style={{ boxShadow: '0 -4px 20px rgba(249, 115, 22, 0.5), 0 4px 20px rgba(249, 115, 22, 0.5)' }}>       <img
             src={screenshotUrl}
             alt="Screenshot"
             className="w-full h-52 object-cover"
@@ -57,10 +57,10 @@ function CardJournal({ journal, VoirPlus , onDelete , onEdit}) {
       
       <div className="flex justify-between items-center my-4 mx-3">
           <div>
-            <p className="text-sm">{formatDate(createdAt)}</p>
+            <p className="text-sm text-gray-200">{formatDate(createdAt)}</p>
           </div>
 
-          <button onClick={() => VoirPlus(journal.id)} className="text-sm font-medium border-rose-400 cursor-pointer border px-3 py-1 rounded-xl shadow-md shadow-rose-400/90 scale-105 hover:scale-100 duration-500 transition-all">
+          <button onClick={() => VoirPlus(journal.id)} className="text-sm font-medium text-gray-200 border-orange-400 cursor-pointer border px-3 py-1 rounded-xl shadow-sm shadow-orange-500/90 hover:scale-103 duration-500 transition-all">
             View more
           </button>
         </div>

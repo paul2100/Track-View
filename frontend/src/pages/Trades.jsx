@@ -133,7 +133,7 @@ useEffect(() => {
 
 
   const fetchTrades = () => {
-    axios.get('http://localhost:3000/api/trade/getAllTrades', { withCredentials: true })
+    axios.get(`http://localhost:3000/api/trade/getAllTrades?period=${period}`, { withCredentials: true })
       .then((res) => {
         if (res.status === 200) {
           setAllTrades(res.data.allTrades);
@@ -144,7 +144,7 @@ useEffect(() => {
       .catch(err => {
         console.error(err.response?.data || err.message);
       });
-  };
+    };
 
 
   const handleDelete = (tradeId) => {
@@ -166,7 +166,7 @@ useEffect(() => {
 
   useEffect(() => {
     fetchTrades();
-  }, []);
+  }, [period]);
 
   useEffect(() => {
     if (location.state?.toastMessage) {
@@ -178,11 +178,11 @@ useEffect(() => {
   return (
     <div className="flex relative">
       <Sidebar />
-      <main className="md:ml-[260px] p-6 flex-1 bg-gray-50 min-h-screen">
+      <main className="md:ml-[260px] p-6 flex-1 bg-black min-h-screen">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center mt-5 rounded-md mb-6">
           <div className="mb-4 md:mb-0">
-            <h1 className="md:text-4xl text-2xl font-semibold">Trades</h1>
-            <span className="text-gray-500 text-base">
+            <h1 className="md:text-4xl text-2xl text-white font-semibold">Trades</h1>
+            <span className="text-gray-400 text-base">
               Browse all your trades on this page
             </span>
           </div>
@@ -195,11 +195,11 @@ useEffect(() => {
               + Create
             </button>
 
-          <div className="md:mr-5 md:mt-0 mt-10">
-          <button onClick={() => setPeriod('week')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-black/40 text-black/50 hover:scale-110 hover:shadow-orange-500 duration-300 ${period === 'week' ? 'text-orange-400' : ''}`}>Week</button>
-          <button onClick={() => setPeriod('month')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-black/40 text-black/50 hover:scale-110 hover:shadow-orange-500 duration-300 ${period === 'month' ? 'text-orange-400' : ''}`}>Month</button>
-          <button onClick={() => setPeriod('year')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-black/40 text-black/50 hover:scale-110 hover:shadow-orange-500 duration-300 ${period === 'year' ? 'text-orange-400' : ''}`}>Year</button>
-        </div>
+            <div className="md:mr-5 md:mt-0 mt-10">
+                <button onClick={() => setPeriod('week')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-black/40  hover:scale-105  duration-300 ${period === 'week' ? 'text-orange-400 border border-orange-400 shadow-orange-400' : 'text-gray-200 border border-white shadow-white'}`}>Week</button>
+                <button onClick={() => setPeriod('month')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-black/40  hover:scale-105 duration-300 ${period === 'month' ? 'text-orange-400 border border-orange-400 shadow-orange-400' : 'text-gray-200 border border-white shadow-white'}`}>Month</button>
+                <button onClick={() => setPeriod('year')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-black/40  hover:scale-105  duration-300 ${period === 'year' ? 'text-orange-400 border border-orange-400 shadow-orange-400' : 'text-gray-200 border border-white shadow-white'}`}>Year</button>
+            </div>
           </div>
         </div>
 
@@ -238,7 +238,7 @@ useEffect(() => {
           
         ) : (
           <div>
-            <h3 className="text-xl font-semibold text-gray-700 mb-4"><span className='text-orange-400'>A</span>ll Trades</h3>
+            <h3 className="text-xl font-semibold text-gray-200 mb-4"><span className='text-orange-400'>A</span>ll Trades</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {allTrades.map(trade => (
                 <CardTrades
