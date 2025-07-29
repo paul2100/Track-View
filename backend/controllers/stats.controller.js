@@ -107,6 +107,7 @@ export async function getTotalTrades(req, res) {
 export async function getMaxDrawdown(req, res) {
   const userId = req.user.id;
   const { period } = req.query;
+
   const startDate = getStartDateByPeriod(period);
   const endDate = getEndDateByPeriod(period);
 
@@ -115,11 +116,22 @@ export async function getMaxDrawdown(req, res) {
   }
 
   try {
+    const portefeuille = await prisma.portefeuille.findUnique({
+      where: { userId },
+      select: { solde_initial: true }
+    });
+
+    if (!portefeuille) {
+      return res.status(400).json({ error: "Capital initial introuvable pour cet utilisateur" });
+    }
+
+    const capitalInitial = Number(portefeuille.solde_initial);
+
     const trades = await prisma.trade.findMany({
       where: {
         userId,
         status: 'CLOSED',
-        closedAt: { 
+        closedAt: {
           gte: startDate,
           lte: endDate,
         },
@@ -131,25 +143,32 @@ export async function getMaxDrawdown(req, res) {
       return res.status(200).json({ success: true, maxDrawdown: null, message: 'Aucun trade trouvé' });
     }
 
-    let equity = 0;
-    let peak = 0;
+    let equity = capitalInitial;
+    let peak = capitalInitial;
     let maxDrawdown = 0;
 
     for (const trade of trades) {
-      equity += trade.result;
+      const result = Number(trade.result ?? 0);
+      equity += result;
+
       if (equity > peak) peak = equity;
 
-      const drawdown = peak - equity;
+      const drawdown = ((peak - equity) / (peak || 1)) * 100;
+
       if (drawdown > maxDrawdown) maxDrawdown = drawdown;
     }
 
-    return res.status(200).json({ success: true, maxDrawdown: Number(maxDrawdown.toFixed(2))});
+    return res.status(200).json({
+      success: true,
+      maxDrawdown: Number(maxDrawdown.toFixed(2)), 
+    });
 
   } catch (error) {
     console.error("Erreur getMaxDrawdown:", error);
     return res.status(500).json({ error: "Erreur serveur" });
   }
 }
+
 
 
 export async function getWinTrade(req, res) {
@@ -424,7 +443,7 @@ export async function getPnlChart(req, res) {
   }
 }
 
-
+// recupere les trade closed par jours pour afficher dans le calendar 
 export async function getTradeClosedByDay(req , res) {
   const userId = req.user.id;
   const grouped = {};
@@ -468,6 +487,7 @@ export async function getTradeClosedByDay(req , res) {
 }
 
 
+// recupere le total de trade par paires 
 export async function getTradeByPaire(req , res) {
   const userId = req.user.id;
   const {period} = req.query;
@@ -519,7 +539,7 @@ export async function getTradeByPaire(req , res) {
   }
 }
 
-
+// recupere le total de result par paire 
 export async function getTradeByPaireResult(req , res) {
   const userId = req.user.id;
   const {period} = req.query;
@@ -620,4 +640,139 @@ export async function getLongShortByTrade(req , res) {
     res.status(500).json({error: 'Erreur serveur.'});
   }
 
+}
+
+// Recupere le temps moyen des trade win ou loss pour les afficher dans un graph pie ou donut
+export async function getAverageTimeLossAndWinTrade(req , res) {
+  const userId = req.user.id;
+  const {period} = req.query;
+
+  const startDate = getStartDateByPeriod(period);
+  const endDate = getEndDateByPeriod(period); 
+
+  try {
+
+    const trades = await prisma.trade.findMany({
+      where: {
+        userId,
+        status: 'CLOSED',
+        closedAt: {
+          gte: startDate,
+          lte: endDate
+        },
+      },
+      select: {
+        id: true, 
+        createdAt: true,
+        closedAt: true,
+        result: true
+      }
+    });
+
+    if (!trades || trades.length === 0) {
+      return res.status(404).json({erreur: 'Aucuns trades trouvé !'});
+    }
+
+    const WinTrade = trades.filter(t => t.result > 0 && t.createdAt && t.closedAt);
+    const LossTrade = trades.filter(t => t.result < 0 && t.createdAt && t.closedAt);
+
+    const calcAverageHours = (arr) => {
+      if (arr.length === 0) return 0;
+      const totalDuration = arr.reduce((acc , t) => acc + (new Date(t.closedAt) - new Date(t.createdAt)), 0);
+      const avgMs = totalDuration /arr.length;
+      const hours = Math.floor(avgMs / (1000 * 60 * 60));
+      const minutes = Math.floor((avgMs % (1000 * 60 * 60)) / (1000 * 60));
+      return `${hours}h ${minutes}m`
+    };
+
+    const avgWin = calcAverageHours(WinTrade);
+    const avgLoss = calcAverageHours(LossTrade);
+
+
+    return res.status(200).json({success: true , data:{avgWin , avgLoss} })
+    
+  } catch (error) {
+    console.error("Erreur AverageTimeLossAndWinTrade :", error);
+    res.status(500).json({error: 'Erreur serveur.'});
+  }
+}
+
+
+
+// Recupere les drowdown dans le temps pour les afficher dans un graph
+export async function  getDrawdownInPourcent(req , res) {
+
+  const userId = req.user.id;
+  const {period} = req.query;
+
+  const startDate = getStartDateByPeriod(period);
+  const endDate = getEndDateByPeriod(period); 
+
+  try {
+
+    const portefeuille = await prisma.portefeuille.findUnique({
+      where: { userId },
+      select: { solde_initial: true }
+    });
+
+    if (!portefeuille) {
+      return res.status(400).json({ error: "Capital initial introuvable pour cet utilisateur" });
+    }
+
+    const capitalInitial = Number(portefeuille.solde_initial);
+
+    const trades = await prisma.trade.findMany({
+      where: {
+        userId,
+        status: 'CLOSED',
+        closedAt: {
+          gte: startDate,
+          lte: endDate
+        },
+      },
+      select: {
+        id: true, 
+        createdAt: true,
+        closedAt: true,
+        result: true
+      }
+    });
+
+    if (!trades || trades.length === 0) {
+      return res.status(404).json({erreur: 'Aucuns trades trouvé !'});
+    }
+
+    let equity = capitalInitial;
+    let peak = capitalInitial;
+    const drawdownHistory = [];
+
+    for (const trade of trades) {
+      console.log('Equity:', equity, 'Peak:', peak);
+      equity += trade.result;
+      if (equity > peak) peak = equity;
+
+      let drawdown = 0;
+
+      if (peak > 0) {
+        drawdown = ((peak - equity) / (peak || 1)) * 100;
+      } else {
+        drawdown = 0;
+      }
+
+  
+
+      drawdownHistory.push({
+        date: trade.closedAt,
+        drawdown: Number(drawdown.toFixed(2)),
+        equity: Number(equity.toFixed(2))
+      });
+    }
+
+    return res.status(200).json({success: true , drawdownHistory})
+
+
+  } catch (error) {
+    console.error("Erreur DrawdownInPourcent :", error);
+    res.status(500).json({error: 'Erreur serveur.'});
+  }
 }
