@@ -466,3 +466,158 @@ export async function getTradeClosedByDay(req , res) {
     res.status(500).json({error: 'Erreur serveur.'});
   }
 }
+
+
+export async function getTradeByPaire(req , res) {
+  const userId = req.user.id;
+  const {period} = req.query;
+
+  const startDate = getStartDateByPeriod(period);
+  const endDate = getEndDateByPeriod(period);
+
+  try {
+  const trades = await prisma.trade.findMany({
+    where: {
+      userId,
+      status: 'CLOSED',
+      closedAt: { 
+          gte: startDate,
+          lte: endDate,
+        },
+    },
+    select: {
+      id: true,
+      paire: true,
+      closedAt: true,
+      createdAt: true
+    }
+  });
+
+  if (!trades || trades.length === 0) {
+    return res.status(404).json({error: 'Aucuns trades trouvé !'});
+  }
+
+  const counts = {};
+
+
+  for (const trade of trades) {
+    const paire = trade.paire;
+
+    if (counts[paire]) {
+      counts[paire] += 1;
+    }
+    else {
+      counts[paire] = 1
+    }
+  }
+
+  return res.status(200).json({success: true , counts})
+
+  } catch (error) {
+    console.error("Erreur TradeByPaire :", error);
+    res.status(500).json({error: 'Erreur serveur.'});
+  }
+}
+
+
+export async function getTradeByPaireResult(req , res) {
+  const userId = req.user.id;
+  const {period} = req.query;
+
+  const startDate = getStartDateByPeriod(period);
+  const endDate = getEndDateByPeriod(period);
+
+  try {
+  const trades = await prisma.trade.findMany({
+    where: {
+      userId,
+      status: 'CLOSED',
+      closedAt: { 
+          gte: startDate,
+          lte: endDate,
+        },
+    },
+    select: {
+      id: true,
+      paire: true,
+      result: true,
+      closedAt: true,
+      createdAt: true
+    }
+  });
+
+  if (!trades || trades.length === 0) {
+    return res.status(404).json({error: 'Aucuns trades trouvé !'});
+  }
+
+  const counts = {};
+
+  
+  for (const trade of trades) {
+    const paire = trade.paire;
+    const perf = trade.result;
+
+    if (counts[paire]) {
+      counts[paire] += perf;
+    } else {
+      counts[paire] = perf;
+    }
+  }
+
+
+  return res.status(200).json({success: true , counts})
+
+  } catch (error) {
+    console.error("Erreur TradeByPaireResult :", error);
+    res.status(500).json({error: 'Erreur serveur.'});
+  }
+}
+
+
+// Donut Chart : Répartition Long vs Short
+export async function getLongShortByTrade(req , res) {
+  const userId = req.user.id;
+  const {period} = req.query;
+
+  const startDate = getStartDateByPeriod(period);
+  const endDate = getEndDateByPeriod(period);
+  
+  try {
+    const trades = await prisma.trade.findMany({
+      where:{
+        userId,
+        status: 'CLOSED',
+        closedAt: { 
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      select: {
+        id: true, 
+        paire: true,
+        direction: true,
+        createdAt: true, 
+        closedAt: true
+      }
+    });
+
+    if (!trades || trades.length === 0) {
+      return res.status(404).json({error: 'Aucuns trades trouvé !'});
+    }
+
+    const counts = {LONG: 0 , SHORT: 0};
+
+    for (const trade of trades) {
+      if (trade.direction === 'LONG') counts.LONG += 1;
+      else if(trade.direction === 'SHORT') counts.SHORT +=1;
+    }
+
+    return res.status(200).json({success: true , counts})
+
+
+  } catch (error) {
+    console.error("Erreur TradeByDirection :", error);
+    res.status(500).json({error: 'Erreur serveur.'});
+  }
+
+}
