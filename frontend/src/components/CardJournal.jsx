@@ -13,7 +13,7 @@ function CardJournal({ journal, VoirPlus , onDelete , onEdit}) {
   });
 
   return (
-  <div className="group relative border bg-gray-500/20 border-stone-300/20 rounded-3xl overflow-hidden duration-500 transition-all cursor-pointer">
+  <div className="group relative border bg-gray-500/20 shadow-stone-300/30 shadow-md border-stone-300/30 rounded-3xl overflow-hidden duration-500 transition-all cursor-pointer">
       <div className='mx-3 my-4 flex justify-between items-center'>
         <div>
             <h2 className="text-xl text-white font-semibold tracking-tight">
@@ -42,7 +42,7 @@ function CardJournal({ journal, VoirPlus , onDelete , onEdit}) {
 
       </div>
       {screenshotUrl ? (
-      <div className="overflow-hidden" style={{ boxShadow: '0 -4px 20px rgba(249, 115, 22, 0.5), 0 4px 20px rgba(249, 115, 22, 0.5)' }}>       <img
+      <div className="overflow-hidden" style={{ boxShadow: '0 -4px 20px rgba(249, 115, 22, 0.5), 0 4px 20px rgba(249, 115, 22, 0.5)' }}><img
             src={screenshotUrl}
             alt="Screenshot"
             className="w-full h-52 object-cover"
