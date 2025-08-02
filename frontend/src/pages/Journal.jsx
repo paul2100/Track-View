@@ -117,8 +117,8 @@ function Journal() {
         )}
 
         {allJournaux.length === 0 ? (
-          <div className='flex justify-center flex-col items-center h-screen bg-gray-100 rounded-lg'>
-            <h3 className='text-sm mb-10 text-black'>You have not added any trades yet, please add one!</h3>
+          <div className='flex justify-center flex-col items-center h-screen duration-500 hover:scale-102 bg-gray-200/10 border border-stone-200/40 rounded-lg'>
+            <h3 className='text-sm mb-10 text-gray-500'>You have not added any trades yet, please add one!</h3>
             <div className='p-10 bg-rose-100 rounded-[300px]'>
               <img src="src/assets/image.svg" alt="" className='h-15 w-15 opacity-40'/>
             </div>

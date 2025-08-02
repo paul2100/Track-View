@@ -93,15 +93,15 @@ function BarChartTradesPerformance({ countPaireByResult = {} }) {
   };
 
   return (
-    <div className='bg-gray-200/10 border border-stone-300/30 rounded-2xl shadow-stone-300/30 shadow-md h-70 w-full md:mt-0 mt-5 p-2'>
+    <div className='bg-gray-200/10 border border-stone-300/30 rounded-2xl inset-shadow-stone-300/30 inset-shadow-sm shadow-md shadow-stone-300/30 h-69 w-full md:mt-0 mt-5 p-2'>
       <div className="w-full h-full">
-        <Bar 
-          data={data} 
-          options={options} 
-          width={null} 
-          height={null} 
-          className='w-full h-full' 
-        />
+        {countPaireByResult && Object.keys(countPaireByResult).length > 0 ? (
+          <Bar data={data} options={options} width={null} height={null} className='w-full h-full'/>
+        ) : (
+        <div className="flex items-center justify-center h-full text-gray-500">
+          Aucune donnée pour cette période
+        </div>
+        )}
       </div>
     </div>
   );

@@ -4,19 +4,27 @@ import CalendarTrade from '../components/CalendarTrade'
 import DonutChartTrades from '../components/DonutChartTrades';
 import BarChartTradesPerformance from '../components/BarChartTradesPerformance';
 import axios from 'axios';
+import DonutLongShort from '../components/DonutLongShort';
 
 function Performance() {
 
   const [groupeTrades , setGroupeTrades] = useState({});
-  const [period , setPeriod] = useState('month');
+  const [period , setPeriod] = useState('week');
   const [countPaireByPaire , setCountPaireByPaire] = useState({});
   const [countPaireByResult , setCountPaireByResult] = useState({});
+  const [TotalLongShortTrade , setTotalLongShortTrade] = useState({});
+  const [AverageTimeLossAndWinTrade , setAverageTimeLossAndWinTrade] = useState({});
+  const [DrawdownInPourcent , setDrawdownInPourcent] = useState({});
+  const [FiveBestTrade , setFiveBestTrade] = useState({});
+  const [FiveWorstTrade , setFiveWorstTrade] = useState({});
+
 
   useEffect(() => {
     axios.get('http://localhost:3000/api/stats/getTradeClosedByDay' , { withCredentials: true})
     .then(res => {
         if (res.status === 200) {
             setGroupeTrades(res.data.grouped);
+
         }
     })
     .catch(err => console.error("Erreur axios grouped trades :", err));
@@ -30,7 +38,7 @@ function Performance() {
             setCountPaireByPaire(res.data.counts);
         }
     })
-    .catch(err => console.error("Erreur axios grouped trades :", err));
+    .catch(err => console.error("Erreur axios getTradeByPaire :", err));
   }, [period]);  
 
   // Count by Perf
@@ -38,11 +46,74 @@ function Performance() {
     axios.get(`http://localhost:3000/api/stats/getTradeByPaireResult?period=${period}` , { withCredentials: true})
     .then(res => {
         if (res.status === 200) {
-            setCountPaireByResult(res.data.counts);
+            setCountPaireByResult(res.data.countsTradeByResult);
         }
     })
-    .catch(err => console.error("Erreur axios grouped trades :", err));
+    .catch(err => console.error("Erreur axios getTradeByPaireResult :", err));
   }, [period]);
+
+
+  // Count Long and short 
+  useEffect(() => {
+    axios.get(`http://localhost:3000/api/stats/getLongShortByTrade?period=${period}` , { withCredentials: true})
+    .then(res => {
+        if (res.status === 200) {
+            setTotalLongShortTrade(res.data.counts);
+            console.log(res.data.counts);
+        }
+    })
+    .catch(err => console.error("Erreur axios getTradeByPaireResult :", err));
+  }, [period]);
+
+
+  // AverageTimeLossAndWinTrade
+  useEffect(() => {
+    axios.get(`http://localhost:3000/api/stats/getAverageTimeLossAndWinTrade?period=${period}` , { withCredentials: true})
+    .then(res => {
+        if (res.status === 200) {
+            setAverageTimeLossAndWinTrade(res.data.data);
+        }
+    })
+    .catch(err => console.error("Erreur axios getTradeByPaireResult :", err));
+  }, [period]);
+
+  // Drowdawn In pourcent 
+  useEffect(() => {
+    axios.get(`http://localhost:3000/api/stats/getDrawdownInPourcent?period=${period}` , { withCredentials: true})
+    .then(res => {
+        if (res.status === 200) {
+            setDrawdownInPourcent(res.data.drawdownHistory);
+            console.log(res.data.drawdownHistory)
+        }
+    })
+    .catch(err => console.error("Erreur axios getTradeByPaireResult :", err));
+  }, [period]);
+
+  // Best five Trade 
+  useEffect(() => {
+    axios.get(`http://localhost:3000/api/stats/getFiveBestTrade?period=${period}` , { withCredentials: true})
+    .then(res => {
+        if (res.status === 200) {
+            setFiveBestTrade(res.data.bestTrades);
+            console.log(res.data.bestTrades)
+        }
+    })
+    .catch(err => console.error("Erreur axios getTradeByPaireResult :", err));
+  }, [period]);
+  
+  // Worst five Trade 
+  useEffect(() => {
+    axios.get(`http://localhost:3000/api/stats/getFiveWorstTrade?period=${period}` , { withCredentials: true})
+    .then(res => {
+        if (res.status === 200) {
+            setFiveWorstTrade(res.data.worstTrades);
+            console.log(res.data.worstTrades)
+        }
+    })
+    .catch(err => console.error("Erreur axios getTradeByPaireResult :", err));
+  }, [period]);   
+
+ 
 
 
   return (
@@ -58,24 +129,42 @@ function Performance() {
           </div>
 
           <div className="md:mr-5 md:mt-0">
-              <button onClick={() => setPeriod('week')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-black/40  hover:scale-105  duration-300 ${period === 'week' ? 'text-orange-400 border border-orange-400 shadow-orange-400' : 'text-gray-200 border border-white shadow-white'}`}>Week</button>
-              <button onClick={() => setPeriod('month')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-black/40  hover:scale-105 duration-300 ${period === 'month' ? 'text-orange-400 border border-orange-400 shadow-orange-400' : 'text-gray-200 border border-white shadow-white'}`}>Month</button>
               <button onClick={() => setPeriod('year')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-black/40  hover:scale-105  duration-300 ${period === 'year' ? 'text-orange-400 border border-orange-400 shadow-orange-400' : 'text-gray-200 border border-white shadow-white'}`}>Year</button>
+              <button onClick={() => setPeriod('month')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-black/40  hover:scale-105 duration-300 ${period === 'month' ? 'text-orange-400 border border-orange-400 shadow-orange-400' : 'text-gray-200 border border-white shadow-white'}`}>Month</button>
+              <button onClick={() => setPeriod('week')} className={`mr-3 cursor-pointer py-1 px-4 shadow-sm rounded-4xl shadow-black/40  hover:scale-105  duration-300 ${period === 'week' ? 'text-orange-400 border border-orange-400 shadow-orange-400' : 'text-gray-200 border border-white shadow-white'}`}>Week</button>
           </div>
 
         </div>
 
         <div className='w-full flex md:flex-row flex-col'>
-            <div className='md:w-2/3'>
+            <div className='md:w-2/3 mr-4'>
               <CalendarTrade groupeTrades={groupeTrades}/>
             </div>
             <div className='flex flex-col justify-between md:w-1/3 md:mt-0'>
               <DonutChartTrades countPaireByPaire={countPaireByPaire}/>
               <BarChartTradesPerformance countPaireByResult={countPaireByResult}/>
             </div>
-
-
         </div>
+
+        <div className='w-full flex flex-col'>
+          <div className='flex flex-row w-full my-6'>
+            <div className='w-1/2'>
+              <DonutLongShort TotalLongShortTrade={TotalLongShortTrade}/>
+            </div>
+            <div className='w-1/2'>
+              <DonutLongShort TotalLongShortTrade={TotalLongShortTrade}/>
+            </div>
+          </div>
+
+          <div className='w-full'>
+            <div className='h-80'> 
+              <DonutLongShort TotalLongShortTrade={TotalLongShortTrade}/>
+            </div>
+          </div>
+        </div>
+
+
+
 
       </main>
     </div>

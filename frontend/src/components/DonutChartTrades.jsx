@@ -60,12 +60,18 @@ function DonutChartTrades({ countPaireByPaire = {} }) {
   };
 
   return (
-    <div className='bg-gray-200/10 border border-stone-300/30 rounded-2xl shadow-stone-300/30 shadow-md h-70 w-full md:mt-0 mt-5'>
-      <div className="w-full h-full flex justify-center">
+  <div className='bg-gray-200/10 border border-stone-300/30 rounded-2xl inset-shadow-stone-300/30 inset-shadow-sm shadow-md shadow-stone-300/30 h-69 w-full md:mt-0 mt-5'>
+    <div className="w-full h-full flex justify-center">
+      {countPaireByPaire && Object.keys(countPaireByPaire).length > 0 ? (
         <Doughnut data={data} options={options}/>
-      </div>
+      ) : (
+        <div className="flex items-center justify-center h-full text-gray-500">
+          Aucune donnée pour cette période
+        </div>
+      )}
     </div>
-  );
+  </div>
+);
 }
 
 export default DonutChartTrades;

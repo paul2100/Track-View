@@ -220,7 +220,7 @@ useEffect(() => {
           <CardStatsTrades title={'Average time of a trade'} stats={averageStats || '0'} icons={Hourglass} />
           <CardStatsTrades title={'WinRate %'} stats={succesRateStats + '%'} icons={Percent}/>
           <CardStatsTrades title={'Total trade closed'} stats={allTradesStats} icons={Calculator}/>
-          <CardStatsTrades title={'Drawdown max'} stats={drawdownStats ? '-' + drawdownStats : '0'} icons={MoveDownRight}/>
+          <CardStatsTrades title={'Drawdown max'} stats={drawdownStats ? `-${drawdownStats}%` : '0%'} icons={MoveDownRight} />
           <CardStatsTrades title={'Winning trade'} stats={winTradeTotalStats || '0'} icons={MoveUpRight}/>
           <CardStatsTrades title={'The biggest gain'} stats={bestTradeStats || '0'} icons={CircleDollarSign}/>
           <CardStatsTrades title={'Losing trade'} stats={lostTradeTotalStats || '0'} icons={MoveDownRight}/>
@@ -229,7 +229,7 @@ useEffect(() => {
 
 
         {allTrades.length === 0 ? (
-          <div className='flex justify-center flex-col items-center h-screen bg-gray-100 rounded-lg'>
+          <div className='flex justify-center flex-col items-center h-screen bg-gray-200/10 border-stone-200/40 rounded-lg border'>
             <h3 className='text-sm mb-10 text-gray-500'>You have not added any trades yet, please add one !</h3>
             <div className='p-10 bg-rose-100 rounded-[300px]'>
               <img src="src/assets/image.svg" alt="" className='h-15 w-15 opacity-40'/>
