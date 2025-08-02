@@ -1,6 +1,6 @@
 import express from 'express';
 import { authenticateToken } from '../middlewares/authenticateToken.js';
-import {getAverageTimeTrade , getSuccesRate , getTotalTrades , getMaxDrawdown , getLossTrade , getWinTrade , getMaxLost , getMaxWin , getCapitalHistory , getPnl , getRewardRisk , getPnlChart , getTradeClosedByDay , getTradeByPaire , getTradeByPaireResult , getLongShortByTrade , getAverageTimeLossAndWinTrade , getDrawdownInPourcent} from '../controllers/stats.controller.js';
+import {getAverageTimeTrade , getSuccesRate , getTotalTrades , getMaxDrawdown , getLossTrade , getWinTrade , getMaxLost , getMaxWin , getCapitalHistory , getPnl , getRewardRisk , getPnlChart , getTradeClosedByDay , getTradeByPaire , getTradeByPaireResult , getLongShortByTrade , getAverageTimeLossAndWinTrade , getDrawdownInPourcent , getFiveBestTrade , getFiveWorstTrade} from '../controllers/stats.controller.js';
 
 const router = express.Router();
 
@@ -22,9 +22,8 @@ router.get('/getTradeByPaireResult', authenticateToken,  getTradeByPaireResult);
 router.get('/getLongShortByTrade', authenticateToken,  getLongShortByTrade);
 router.get('/getAverageTimeLossAndWinTrade', authenticateToken,  getAverageTimeLossAndWinTrade);
 router.get('/getDrawdownInPourcent', authenticateToken,  getDrawdownInPourcent);
-
-
-
+router.get('/getFiveBestTrade', authenticateToken,  getFiveBestTrade);
+router.get('/getFiveWorstTrade', authenticateToken,  getFiveWorstTrade);
 
 
 

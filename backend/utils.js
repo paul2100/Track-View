@@ -1,54 +1,56 @@
-export function getStartDateByPeriod(period) {
-  const now = new Date();
+import { toZonedTime } from 'date-fns-tz';
+import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, startOfYear, endOfYear } from 'date-fns';
 
-  switch (period) {
-    case 'week': {
-      const day = now.getDay();
-      const diff = (day === 0 ? 6 : day - 1);
-      const monday = new Date(now);
-      monday.setDate(now.getDate() - diff);
-      monday.setHours(0, 0, 0, 0);
-      return monday;
+export function getStartDateByPeriod(period) {
+  try {
+    const date = new Date();
+    const timeZone = 'Europe/Paris';
+
+    switch (period) {
+      case 'week': {
+        const startWeek = startOfWeek(date, { weekStartsOn: 1 });
+        return toZonedTime(startWeek, timeZone);
+      }
+      case 'month': {
+        const startMonth = startOfMonth(date);
+        return toZonedTime(startMonth, timeZone);
+      }
+      case 'year': {
+        const startYear = startOfYear(date);
+        return toZonedTime(startYear, timeZone);
+      }
+      default:
+        return null;
     }
-    case 'month': {
-      return new Date(now.getFullYear(), now.getMonth(), 1);
-    }
-    case 'year': {
-      return new Date(now.getFullYear(), 0, 1);
-    }
-    default:
-      return null;
+  } catch (error) {
+    console.error('Erreur dans getStartDateByPeriod:', error);
+    return null;
   }
 }
 
 export function getEndDateByPeriod(period) {
-  const now = new Date();
+  try {
+    const date = new Date();
+    const timeZone = 'Europe/Paris';
 
-  switch (period) {
-    case 'week': {
-      const day = now.getDay();
-      const diff = (day === 0 ? 6 : day - 1);
-      const monday = new Date(now);
-      monday.setDate(now.getDate() - diff);
-      monday.setHours(0, 0, 0, 0);
-
-      const sunday = new Date(monday);
-      sunday.setDate(monday.getDate() + 6);
-      sunday.setHours(23, 59, 59, 999);
-      return sunday;
+    switch (period) {
+      case 'week': {
+        const endWeek = endOfWeek(date, { weekStartsOn: 1 });
+        return toZonedTime(endWeek, timeZone);
+      }
+      case 'month': {
+        const endMonth = endOfMonth(date);
+        return toZonedTime(endMonth, timeZone);
+      }
+      case 'year': {
+        const endYear = endOfYear(date);
+        return toZonedTime(endYear, timeZone);
+      }
+      default:
+        return null;
     }
-    case 'month': {
-      const firstDayNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-      const lastDayMonth = new Date(firstDayNextMonth - 1);
-      lastDayMonth.setHours(23, 59, 59, 999);
-      return lastDayMonth;
-    }
-    case 'year': {
-      const lastDayYear = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
-      return lastDayYear;
-    }
-    default:
-      return null;
+  } catch (error) {
+    console.error('Erreur dans getEndDateByPeriod:', error);
+    return null;
   }
 }
-

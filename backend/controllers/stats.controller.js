@@ -487,14 +487,14 @@ export async function getTradeClosedByDay(req , res) {
 }
 
 
-// recupere le total de trade par paires 
+// recupere le total de trade par paires OK
 export async function getTradeByPaire(req , res) {
   const userId = req.user.id;
   const {period} = req.query;
 
   const startDate = getStartDateByPeriod(period);
   const endDate = getEndDateByPeriod(period);
-
+  
   try {
   const trades = await prisma.trade.findMany({
     where: {
@@ -513,9 +513,6 @@ export async function getTradeByPaire(req , res) {
     }
   });
 
-  if (!trades || trades.length === 0) {
-    return res.status(404).json({error: 'Aucuns trades trouvé !'});
-  }
 
   const counts = {};
 
@@ -539,7 +536,7 @@ export async function getTradeByPaire(req , res) {
   }
 }
 
-// recupere le total de result par paire 
+// recupere le total de result par paire  OK
 export async function getTradeByPaireResult(req , res) {
   const userId = req.user.id;
   const {period} = req.query;
@@ -566,26 +563,22 @@ export async function getTradeByPaireResult(req , res) {
     }
   });
 
-  if (!trades || trades.length === 0) {
-    return res.status(404).json({error: 'Aucuns trades trouvé !'});
-  }
-
-  const counts = {};
+  const countsTradeByResult = {};
 
   
   for (const trade of trades) {
     const paire = trade.paire;
     const perf = trade.result;
 
-    if (counts[paire]) {
-      counts[paire] += perf;
+    if (countsTradeByResult[paire]) {
+      countsTradeByResult[paire] += perf;
     } else {
-      counts[paire] = perf;
+      countsTradeByResult[paire] = perf;
     }
   }
 
 
-  return res.status(200).json({success: true , counts})
+  return res.status(200).json({success: true , countsTradeByResult})
 
   } catch (error) {
     console.error("Erreur TradeByPaireResult :", error);
@@ -594,13 +587,14 @@ export async function getTradeByPaireResult(req , res) {
 }
 
 
-// Donut Chart : Répartition Long vs Short
+// Donut Chart : Répartition Long vs Short Ok Manque le graph
 export async function getLongShortByTrade(req , res) {
   const userId = req.user.id;
   const {period} = req.query;
 
   const startDate = getStartDateByPeriod(period);
   const endDate = getEndDateByPeriod(period);
+  
   
   try {
     const trades = await prisma.trade.findMany({
@@ -621,10 +615,6 @@ export async function getLongShortByTrade(req , res) {
       }
     });
 
-    if (!trades || trades.length === 0) {
-      return res.status(404).json({error: 'Aucuns trades trouvé !'});
-    }
-
     const counts = {LONG: 0 , SHORT: 0};
 
     for (const trade of trades) {
@@ -642,7 +632,7 @@ export async function getLongShortByTrade(req , res) {
 
 }
 
-// Recupere le temps moyen des trade win ou loss pour les afficher dans un graph pie ou donut
+// Recupere le temps moyen des trade win ou loss pour les afficher dans un graph pie ou donut Ok manque le graph
 export async function getAverageTimeLossAndWinTrade(req , res) {
   const userId = req.user.id;
   const {period} = req.query;
@@ -668,10 +658,6 @@ export async function getAverageTimeLossAndWinTrade(req , res) {
         result: true
       }
     });
-
-    if (!trades || trades.length === 0) {
-      return res.status(404).json({erreur: 'Aucuns trades trouvé !'});
-    }
 
     const WinTrade = trades.filter(t => t.result > 0 && t.createdAt && t.closedAt);
     const LossTrade = trades.filter(t => t.result < 0 && t.createdAt && t.closedAt);
@@ -699,7 +685,7 @@ export async function getAverageTimeLossAndWinTrade(req , res) {
 
 
 
-// Recupere les drowdown dans le temps pour les afficher dans un graph
+// Recupere les drowdown dans le temps pour les afficher dans un graph  Ok manque graph
 export async function  getDrawdownInPourcent(req , res) {
 
   const userId = req.user.id;
@@ -738,10 +724,6 @@ export async function  getDrawdownInPourcent(req , res) {
       }
     });
 
-    if (!trades || trades.length === 0) {
-      return res.status(404).json({erreur: 'Aucuns trades trouvé !'});
-    }
-
     let equity = capitalInitial;
     let peak = capitalInitial;
     const drawdownHistory = [];
@@ -776,3 +758,128 @@ export async function  getDrawdownInPourcent(req , res) {
     res.status(500).json({error: 'Erreur serveur.'});
   }
 }
+
+// Recupere les 5 meilleur trade pour les mettre dans un tableau 
+export async function getFiveBestTrade(req , res) {
+  const userId = req.user.id;
+  const {period} = req.query;
+
+  const startDate = getStartDateByPeriod(period);
+  const endDate = getEndDateByPeriod(period);
+
+  try {
+
+    const trades = await prisma.trade.findMany({
+      where: {
+        userId,
+        status: 'CLOSED',
+        closedAt: {
+          gte: startDate,
+          lte: endDate
+        },
+      } ,
+      select: {
+        id: true,
+        result: true,
+        paire: true, 
+        createdAt: true,
+        closedAt: true,
+        risk_amount: true
+      }
+    });
+
+    const bestTrades = trades
+    .filter(trade => trade.risk_amount && trade.risk_amount !== 0 && trade.result > 0)
+    .map(trade => {
+      const durationMinutes = (new Date(trade.closedAt) - new Date(trade.createdAt)) / (1000 * 60);
+      const hours = Math.floor(durationMinutes / 60);
+      const minutes = Math.floor(durationMinutes % 60);
+
+      return {
+        id: trade.id,
+        paire: trade.paire,
+        pnl: trade.result,
+        rr: Number((trade.result / trade.risk_amount).toFixed(2)),
+        duration: `${hours}h ${minutes}m`,
+        date: new Date(trade.closedAt).toLocaleString('fr-FR', {
+          day: '2-digit', month: '2-digit', year: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        })
+      };
+    })
+    .sort((a,b) => b.pnl - a.pnl)
+    .slice(0,5);
+
+
+    return res.status(200).json({success: true , bestTrades})
+
+    
+  } catch (error) {
+    console.error("Erreur getFiveBestTrade :", error);
+    res.status(500).json({error: 'Erreur serveur.'});
+  }
+}
+
+
+// Recupere les 5 pire trade pour les mettre dans un tableau 
+export async function getFiveWorstTrade(req , res) {
+  const userId = req.user.id;
+  const {period} = req.query;
+
+  const startDate = getStartDateByPeriod(period);
+  const endDate = getEndDateByPeriod(period);
+
+  try {
+
+    const trades = await prisma.trade.findMany({
+      where: {
+        userId,
+        status: 'CLOSED',
+        closedAt: {
+          gte: startDate,
+          lte: endDate
+        },
+      } ,
+      select: {
+        id: true,
+        result: true,
+        paire: true, 
+        createdAt: true,
+        closedAt: true,
+        risk_amount: true
+      }
+    });
+
+    const worstTrades = trades
+    .filter(trade => trade.risk_amount && trade.risk_amount !== 0 && trade.result < 0)
+    .map(trade => {
+      const durationMinutes = (new Date(trade.closedAt) - new Date(trade.createdAt)) / (1000 * 60);
+      const hours = Math.floor(durationMinutes / 60);
+      const minutes = Math.floor(durationMinutes % 60);
+
+      return {
+        id: trade.id,
+        paire: trade.paire,
+        pnl: trade.result,
+        rr: Number((trade.result / trade.risk_amount).toFixed(2)),
+        duration: `${hours}h ${minutes}m`,
+        date: new Date(trade.closedAt).toLocaleString('fr-FR', {
+          day: '2-digit', month: '2-digit', year: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        })
+      };
+    })
+    .sort((a,b) => a.pnl - b.pnl)
+    .slice(0,5);
+
+
+    return res.status(200).json({success: true , worstTrades})
+
+    
+  } catch (error) {
+    console.error("Erreur getFiveWorstTrade :", error);
+    res.status(500).json({error: 'Erreur serveur.'});
+  }
+}
+
+
