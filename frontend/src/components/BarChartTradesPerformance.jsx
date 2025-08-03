@@ -35,7 +35,6 @@ function BarChartTradesPerformance({ countPaireByResult = {} }) {
         backgroundColor: Object.keys(countPaireByResult).map((_, index) =>
           colors[index % colors.length]
         ),
-        borderRadius: 6,
         barThickness: 14,
       },
     ],

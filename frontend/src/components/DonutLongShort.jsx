@@ -42,13 +42,16 @@ function DonutLongShort({ TotalLongShortTrade = {} }) {
         },
       },
     },
-    cutout: '60%',
+    circumference: 180,
+    rotation: 270,
+    aspectRatio: 2,
+
   };
 
   return (
-    <div className='bg-gray-200/10 border border-stone-300/30 rounded-2xl inset-shadow-stone-300/30 inset-shadow-sm shadow-md shadow-stone-300/30 h-69 w-full md:mt-0 mt-5 p-4'>
+    <div className='bg-gray-200/10 border border-stone-300/30 rounded-2xl inset-shadow-stone-300/30 inset-shadow-sm shadow-md shadow-stone-300/30 h-80 w-143 md:mt-0 mt-5'>
       <div className="w-full h-full flex justify-center items-center">
-        {TotalLongShortTrade && Object.keys(TotalLongShortTrade).length > 0 ? (
+        {TotalLongShortTrade && Object.keys(TotalLongShortTrade).length > 0 && (TotalLongShortTrade.LONG > 0 || TotalLongShortTrade.SHORT > 0)? (
           <Doughnut data={data} options={options} />
         ) : (
           <div className="flex items-center justify-center h-full text-gray-500">

@@ -5,6 +5,9 @@ import DonutChartTrades from '../components/DonutChartTrades';
 import BarChartTradesPerformance from '../components/BarChartTradesPerformance';
 import axios from 'axios';
 import DonutLongShort from '../components/DonutLongShort';
+import BarChartHorizontalAverageTime from '../components/BarChartHorizontalAverageTime';
+import LineChartDrawdown from '../components/LineChartDrawdown';
+
 
 function Performance() {
 
@@ -15,8 +18,20 @@ function Performance() {
   const [TotalLongShortTrade , setTotalLongShortTrade] = useState({});
   const [AverageTimeLossAndWinTrade , setAverageTimeLossAndWinTrade] = useState({});
   const [DrawdownInPourcent , setDrawdownInPourcent] = useState({});
-  const [FiveBestTrade , setFiveBestTrade] = useState({});
-  const [FiveWorstTrade , setFiveWorstTrade] = useState({});
+  const [FiveBestTrade , setFiveBestTrade] = useState([]);
+  const [FiveWorstTrade , setFiveWorstTrade] = useState([]);
+
+
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const [datePart, timePart] = dateString.split(' ');
+    const [day, month, year] = datePart.split('/');
+    const isoDate = `${year}-${month}-${day}T${timePart || "00:00"}`;
+    const date = new Date(isoDate);
+    return isNaN(date) ? "Invalid Date" : date.toLocaleDateString();
+  };
+
 
 
   useEffect(() => {
@@ -59,7 +74,6 @@ function Performance() {
     .then(res => {
         if (res.status === 200) {
             setTotalLongShortTrade(res.data.counts);
-            console.log(res.data.counts);
         }
     })
     .catch(err => console.error("Erreur axios getTradeByPaireResult :", err));
@@ -83,7 +97,6 @@ function Performance() {
     .then(res => {
         if (res.status === 200) {
             setDrawdownInPourcent(res.data.drawdownHistory);
-            console.log(res.data.drawdownHistory)
         }
     })
     .catch(err => console.error("Erreur axios getTradeByPaireResult :", err));
@@ -95,7 +108,6 @@ function Performance() {
     .then(res => {
         if (res.status === 200) {
             setFiveBestTrade(res.data.bestTrades);
-            console.log(res.data.bestTrades)
         }
     })
     .catch(err => console.error("Erreur axios getTradeByPaireResult :", err));
@@ -107,7 +119,6 @@ function Performance() {
     .then(res => {
         if (res.status === 200) {
             setFiveWorstTrade(res.data.worstTrades);
-            console.log(res.data.worstTrades)
         }
     })
     .catch(err => console.error("Erreur axios getTradeByPaireResult :", err));
@@ -137,7 +148,7 @@ function Performance() {
         </div>
 
         <div className='w-full flex md:flex-row flex-col'>
-            <div className='md:w-2/3 mr-4'>
+            <div className='md:w-2/3 mr-4 w-full'>
               <CalendarTrade groupeTrades={groupeTrades}/>
             </div>
             <div className='flex flex-col justify-between md:w-1/3 md:mt-0'>
@@ -147,24 +158,101 @@ function Performance() {
         </div>
 
         <div className='w-full flex flex-col'>
-          <div className='flex flex-row w-full my-6'>
-            <div className='w-1/2'>
+          <div className='flex md:flex-row-reverse flex-col w-full md:my-4'>
+            <div className='md:w-1/2 w-full'>
               <DonutLongShort TotalLongShortTrade={TotalLongShortTrade}/>
             </div>
-            <div className='w-1/2'>
-              <DonutLongShort TotalLongShortTrade={TotalLongShortTrade}/>
+            <div className='md:w-1/2 md:mr-4 w-full'>
+              <BarChartHorizontalAverageTime AverageTimeLossAndWinTrade={AverageTimeLossAndWinTrade}/>
             </div>
           </div>
 
           <div className='w-full'>
-            <div className='h-80'> 
-              <DonutLongShort TotalLongShortTrade={TotalLongShortTrade}/>
+            <div> 
+              <LineChartDrawdown DrawdownInPourcent={DrawdownInPourcent}/>
             </div>
           </div>
         </div>
 
 
+      <div className="my-4 flex flex-col md:flex-row gap-6">
+        <div className="w-full md:w-1/2">
+          <h2 className="text-center text-stone-200 my-2">Five Worst Trades</h2>
+          <div className="border border-orange-400/50 rounded-lg overflow-hidden shadow-sm shadow-orange-500/80">
+            <table className="w-full md:text-sm text-xs">
+              <thead>
+                <tr className="bg-gray-500/30">
+                  <th className="md:py-2 py-1 px-1 text-white">Closing date</th>
+                  <th className="md:py-2 py-1 px-1 text-white">Pair</th>
+                  <th className="md:py-2 py-1 px-1 text-white">Risk-Reward</th>
+                  <th className="md:py-2 py-1 px-1 text-white">Net Result</th>
+                  <th className="md:py-2 py-1 px-1 text-white">Status</th>
+                  <th className="md:py-2 py-1 px-1 text-white">Duration</th>
+                </tr>
+              </thead>
+              <tbody>
+                {FiveWorstTrade.length > 0 ? (
+                  FiveWorstTrade.map((trade, idx) => (
+                    <tr key={trade.id || idx} className="text-center">
+                      <td className="py-2 text-gray-200">{formatDate(trade.date)}</td>
+                      <td className="py-2 text-gray-200">{trade.paire}</td>
+                      <td className="py-2 text-gray-200">{trade.rr}</td>
+                      <td className="py-2 text-gray-200">{trade.pnl.toFixed(2)} €</td>
+                      <td className="py-2 text-gray-200">{trade.direction}</td>
+                      <td className="py-2 text-gray-200">{trade.duration}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="py-4 text-gray-400 text-center">
+                      No worst trades found
+                    </td>
+                  </tr>
+                )}
+            </tbody>
 
+            </table>
+          </div>
+        </div>
+
+        <div className="w-full md:w-1/2">
+          <h2 className="text-center text-stone-200 my-2">Five Best Trades</h2>
+          <div className="border border-orange-400/50 rounded-lg overflow-hidden shadow-sm shadow-orange-500/80">
+            <table className="w-full md:text-sm text-xs">
+              <thead>
+                <tr className="bg-gray-500/30">
+                  <th className="md:py-2 py-1 px-1 text-white">Closing date</th>
+                  <th className="md:py-2 py-1 px-1 text-white">Pair</th>
+                  <th className="md:py-2 py-1 px-1 text-white">Risk-Reward</th>
+                  <th className="md:py-2 py-1 px-1 text-white">Net Result</th>
+                  <th className="md:py-2 py-1 px-1 text-white">Status</th>
+                  <th className="md:py-2 py-1 px-1 text-white">Duration</th>
+                </tr>
+              </thead>
+              <tbody>
+                {FiveBestTrade.length > 0 ? (
+                  FiveBestTrade.map((trade, idx) => (
+                    <tr key={trade.id || idx} className="text-center">
+                      <td className="py-2 text-gray-200">{formatDate(trade.date)}</td>
+                      <td className="py-2 text-gray-200">{trade.paire}</td>
+                      <td className="py-2 text-gray-200">{trade.rr}</td>
+                      <td className="py-2 text-gray-200">{trade.pnl.toFixed(2)} €</td>
+                      <td className="py-2 text-gray-200">{trade.direction}</td>
+                      <td className="py-2 text-gray-200">{trade.duration}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="py-4 text-gray-400 text-center">
+                      No Best trades found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
       </main>
     </div>

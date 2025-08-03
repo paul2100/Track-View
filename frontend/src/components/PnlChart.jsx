@@ -32,7 +32,6 @@ function PnlChart({ data }) {
         label: 'PNL',
         data: pnlValues,
         backgroundColor: pnlValues.map(val => (val >= 0 ? '#f97316' : 'red')),
-        borderRadius: 4,
         barThickness: 14,
       },
     ],
