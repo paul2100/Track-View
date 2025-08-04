@@ -5,37 +5,52 @@ import CapitalChart from '../components/CapitalChart';
 import axios from 'axios';
 import FormAddCapital from '../components/FormAddCapital';
 import PnlChart from '../components/PnlChart';
+import { useNavigate } from 'react-router-dom';
 
 
 
 function Dashboard() {
   const [capital_actuel, setCapital_actuel] = useState('0');
+  const [currency , setCurrency] = useState ('$')
   const [allTradesStats , setAllTradesStats] = useState('0');
-  const [hasPortefeuille, setHasPortefeuille] = useState(true);
   const [capitalHistoryCharts , setCapitalHistoryCharts] = useState([]);
   const [pnlCharts , setPnlChart] = useState([]);
   const [pnLStats , setPnlStats] = useState('');
   const [riskRewardStats , setRiskRewardStats] = useState('');
   const [lastTradeStats , setLastTradeStats] = useState([]);
   const [period, setPeriod] = useState('week');
+  const navigate = useNavigate();
+  const [showAlert, setShowAlert] = useState(false);
+
   
 
 
 useEffect(() => {
-    axios.get('http://localhost:3000/api/portefeuille/getportefeuille', { withCredentials: true })
-      .then(res => {
-        if (res.data?.portefeuille) {
-          setCapital_actuel(res.data.portefeuille.capital_actuel);
-          setHasPortefeuille(true);
-        } else {
-          setHasPortefeuille(false);
-        }
-      })
-      .catch(err => {
-        console.error(err.response?.data || err.message);
-        setHasPortefeuille(false);
-      });
-  }, []);
+  axios.get('http://localhost:3000/api/portefeuille/getportefeuille', { withCredentials: true })
+    .then(res => {
+      if (res.status === 200) {
+        setCapital_actuel(res.data.portefeuille.capital_actuel);
+        setCurrency(res.data.portefeuille.currency);
+        setShowAlert(false);
+      } else {
+        setTimeout(() => {
+          setShowAlert(true);
+        }, 2000);
+      }
+    })
+    .catch(() => {
+      setTimeout(() => {
+        setShowAlert(true);
+      }, 2000);
+    });
+}, []);
+
+
+  const handleOk = () => {
+    setShowAlert(false),
+    navigate('/account');
+  }
+
 
 
 useEffect(() => {
@@ -45,9 +60,6 @@ useEffect(() => {
         setCapitalHistoryCharts(res.data.capitalEvolution);
       }
     })
-    .catch(err => {
-      console.error('Erreur getCapitalHistory:', err);
-    });
 }, []);
 
 
@@ -58,9 +70,6 @@ useEffect(() => {
         setPnlStats(res.data.pnlTotal);
       }
     })
-    .catch(err => {
-      console.error('Erreur getCapitalHistory:', err);
-    });
 }, [period]);
 
 
@@ -69,12 +78,8 @@ useEffect(() => {
     .then(res => {
       if (res.status === 200) {
         setRiskRewardStats(res.data.rewardRisk);
-        console.log(res.data.rewardRisk)
       }
     })
-    .catch(err => {
-      console.error('Erreur getRewardRisk:', err);
-    });
 }, [period]);
 
 
@@ -84,10 +89,7 @@ useEffect(() => {
     if (res.status === 200) {
       setAllTradesStats(res.data.totalTrade)
     }
-      })
-      .catch(err => {
-        console.error(err.response?.data || err.message);
-      });
+    })
 }, [period]);
 
 
@@ -98,9 +100,6 @@ useEffect(() => {
       setLastTradeStats(res.data.lastTrades)
     }
     })
-    .catch(err => {
-      console.error('Erreur :' , err);
-    });
 }, []);
 
 
@@ -109,21 +108,32 @@ useEffect(() => {
     .then(res => {
       if (res.status === 200) {
         setPnlChart(res.data.pnlVariations);
-        console.log(res.data.pnlVariations)
       }
     })
-    .catch(err => {
-      console.error('Erreur pnl:', err);
-    });
 }, [period]);
-
-
 
 
 
   return (
     <div className="flex relative">
       <Sidebar />
+
+      {showAlert && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-8 flex flex-col items-center text-center font-semibold">
+            <p className="mb-6 text-gray-800 text-base leading-relaxed">
+              ! Vous devez avoir un portefeuille pour accéder au dashboard.<br />
+              Vous allez être redirigé vers la page account pour la configuration de votre compte.
+            </p>
+            <button onClick={handleOk} className="bg-orange-500 text-white font-medium px-4 py-2 rounded-lg shadow-md hover:bg-orange-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-orange-400 cursor-pointer">
+              OK
+            </button>
+          </div>
+        </div>
+      )}
+
+
+
       <main className="md:ml-[260px] flex-1 p-6 bg-black min-h-screen">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center mt-5 rounded-md mb-6">
           <div className="mb-4 md:mb-0">
@@ -145,7 +155,7 @@ useEffect(() => {
 
 
         <div className="flex md:justify-between md:flex-row flex-col">
-          <CardStats title="Capital" value={capital_actuel} img='/src/assets/icon.svg' />
+          <CardStats title="Capital" value={capital_actuel} currency={currency} img='/src/assets/icon.svg' />
           <CardStats title="Total trade closed" value={allTradesStats} img='/src/assets/icon.svg' />
           <CardStats title="PNL net" value={pnLStats || '0'} img='/src/assets/icon.svg' />
           <CardStats title="Risk/Reward" value={`${riskRewardStats ?? 0}%`} img='/src/assets/icon.svg' />
@@ -187,16 +197,6 @@ useEffect(() => {
             </tbody>
           </table>
         </div>
-
-
-
-
-        
-        {!hasPortefeuille && (
-          <div className="fixed inset-0 bg-black/10 flex justify-center items-center flex-col z-50" style={{ backdropFilter: 'blur(3px)' }}>
-            <FormAddCapital />
-          </div>
-        )}
 
       </main>
     </div>

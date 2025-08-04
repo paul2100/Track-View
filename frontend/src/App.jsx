@@ -9,6 +9,7 @@ import Journal from './pages/Journal';
 import Trades from './pages/Trades';
 import PrivateRoute from './components/PrivateRoute';
 import Performance from './pages/Performance';
+import Account from './pages/Account';
 
 
 
@@ -27,6 +28,7 @@ function App() {
           <Route path="/journals" element={<Journal />} />
           <Route path="/trades" element={<Trades />} />
           <Route path="/performance" element={<Performance />} />
+          <Route path="/account" element={<Account />} />
         </Route>
 
       </Routes>

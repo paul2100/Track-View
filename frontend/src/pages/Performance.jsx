@@ -12,7 +12,7 @@ import LineChartDrawdown from '../components/LineChartDrawdown';
 function Performance() {
 
   const [groupeTrades , setGroupeTrades] = useState({});
-  const [period , setPeriod] = useState('week');
+  const [period , setPeriod] = useState('year');
   const [countPaireByPaire , setCountPaireByPaire] = useState({});
   const [countPaireByResult , setCountPaireByResult] = useState({});
   const [TotalLongShortTrade , setTotalLongShortTrade] = useState({});

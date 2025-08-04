@@ -51,7 +51,7 @@ function CalendarTrade({ groupeTrades = {} }) {
             </div>
           ) : (
             <div className="mt-auto text-[9px] sm:text-[11px] text-gray-500 italic">
-              Aucun trade
+              No trade
             </div>
           )}
         </div>

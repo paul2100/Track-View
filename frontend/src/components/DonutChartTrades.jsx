@@ -40,7 +40,7 @@ function DonutChartTrades({ countPaireByPaire = {} }) {
     plugins: {
       title: {
         display: true,
-        text: "Performance par paire",
+        text: "Total trade per paire",
         color: "#fff",
         align:"center",
         font: {

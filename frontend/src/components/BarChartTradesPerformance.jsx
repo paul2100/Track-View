@@ -45,7 +45,7 @@ function BarChartTradesPerformance({ countPaireByResult = {} }) {
     plugins: {
       title: {
         display: true,
-        text: "Performance par paire",
+        text: "Pair performance",
         color: "#fff",
         align: "center",
         font: {
