@@ -3,7 +3,7 @@ import prisma from '../prisma/client.js';
 
 export async function createPortefeuille(req, res) {
   const user = req.user.id;
-  const { solde_initial } = req.body;
+  const { solde_initial , currency , leverage , risk_per_trade } = req.body;
   const capital_actuel = solde_initial;
 
   if (solde_initial <= 0) {
@@ -21,7 +21,10 @@ export async function createPortefeuille(req, res) {
   const portefeuille = await prisma.portefeuille.create({
     data: {
       userId: user,
-      solde_initial: solde_initial,
+      solde_initial: Number(solde_initial),
+      currency: currency,
+      leverage: Number(leverage),
+      risk_per_trade: Number(risk_per_trade), 
       capital_actuel: capital_actuel,
     },
   });
@@ -32,15 +35,21 @@ export async function createPortefeuille(req, res) {
 
 
 
-export async function getPortefeuille(req , res) {
-    const user = req.user.id;
-
-    const portefeuille = await prisma.portefeuille.findUnique({ where: { userId: user }});
+export const getPortefeuille = async (req, res) => {
+  try {
+    const portefeuille = await prisma.portefeuille.findUnique({
+      where: { userId: req.user.id }
+    });
 
     if (!portefeuille) {
-        res.status(404).json({error: "portefeuille non trouvé"});
+      return res.status(404).json({ error: 'Aucun portefeuille trouvé' });
     }
 
-    res.status(200).json({succes: true , portefeuille});
-}
+    return res.status(200).json({ portefeuille });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Erreur serveur' });
+  }
+};
+
 

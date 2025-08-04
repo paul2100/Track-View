@@ -721,7 +721,10 @@ export async function  getDrawdownInPourcent(req , res) {
         createdAt: true,
         closedAt: true,
         result: true
-      }
+      },
+      orderBy: {
+      createdAt: 'asc'
+      },
     });
 
     let equity = capitalInitial;
@@ -729,7 +732,6 @@ export async function  getDrawdownInPourcent(req , res) {
     const drawdownHistory = [];
 
     for (const trade of trades) {
-      console.log('Equity:', equity, 'Peak:', peak);
       equity += trade.result;
       if (equity > peak) peak = equity;
 
@@ -784,7 +786,8 @@ export async function getFiveBestTrade(req , res) {
         paire: true, 
         createdAt: true,
         closedAt: true,
-        risk_amount: true
+        risk_amount: true,
+        direction: true
       }
     });
 
@@ -800,6 +803,7 @@ export async function getFiveBestTrade(req , res) {
         paire: trade.paire,
         pnl: trade.result,
         rr: Number((trade.result / trade.risk_amount).toFixed(2)),
+        direction: trade.direction,
         duration: `${hours}h ${minutes}m`,
         date: new Date(trade.closedAt).toLocaleString('fr-FR', {
           day: '2-digit', month: '2-digit', year: 'numeric',
@@ -846,7 +850,8 @@ export async function getFiveWorstTrade(req , res) {
         paire: true, 
         createdAt: true,
         closedAt: true,
-        risk_amount: true
+        risk_amount: true,
+        direction: true
       }
     });
 
@@ -862,6 +867,7 @@ export async function getFiveWorstTrade(req , res) {
         paire: trade.paire,
         pnl: trade.result,
         rr: Number((trade.result / trade.risk_amount).toFixed(2)),
+        direction: trade.direction,
         duration: `${hours}h ${minutes}m`,
         date: new Date(trade.closedAt).toLocaleString('fr-FR', {
           day: '2-digit', month: '2-digit', year: 'numeric',
