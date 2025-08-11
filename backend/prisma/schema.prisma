@@ -27,16 +27,9 @@ model UserProfile {
   id               Int       @id @default(autoincrement())
   userId           Int       @unique
   username         String?   @unique
-  avatarUrl        String?
   role             String    @default("trader")
-  timezone         String?
-  language         String?   @default("fr")
-  experience       String?
-  tradingStyle     String?
-  goalReturn       Float?
   lastLogin        DateTime?
   lastProfileUpdate DateTime?
-
   user             User      @relation(fields: [userId], references: [id])
 }
 

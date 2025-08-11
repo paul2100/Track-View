@@ -3,7 +3,8 @@ import jwt from 'jsonwebtoken';
 import prisma from '../prisma/client.js';
 
 export async function register(req, res) {
-  const { name, email, password } = req.body;
+  const { username, email, password } = req.body;
+
 
   try {
     const existing = await prisma.user.findUnique({ where: { email } });
@@ -11,7 +12,16 @@ export async function register(req, res) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
-      data: { name, email, password: hashedPassword }
+      data: {
+        email, 
+        password: hashedPassword,
+        profile: {
+          create: {
+            username,
+          },
+        },
+      },
+      include: { profile: true},
     });
 
     res.status(201).json({ success: true, user });
@@ -24,27 +34,51 @@ export async function register(req, res) {
 export async function login(req, res) {
   const { email, password } = req.body;
 
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) return res.status(404).json({ error: "Utilisateur non trouvé" });
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: { profile: true }
+    });
+    if (!user) return res.status(404).json({ error: "Utilisateur non trouvé" });
 
-  const passwordMatch = await bcrypt.compare(password, user.password);
-  if (!passwordMatch) return res.status(401).json({ error: 'Mot de passe incorrect' });
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) return res.status(401).json({ error: 'Mot de passe incorrect' });
 
-  const token = jwt.sign(
-    { id: user.id, email: user.email, createdAt: user.createdAt },
-    process.env.JWT_SECRET,
-    { expiresIn: '24h' }
-  );
+    if (!user.profile) {
+      await prisma.userProfile.create({
+        data: {
+          userId: user.id,
+          username: email.split('@')[0],
+        },
+      });
+    } else {
+      await prisma.userProfile.update({
+        where: { userId: user.id },
+        data: { lastLogin: new Date() },
+      });
+    }
 
-  res.cookie('token', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 3600000
-  });
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.profile?.role || 'trader' },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
 
-  res.status(200).json({ success: true });
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 3600000,
+    });
+
+    res.status(200).json({ success: true, user: { id: user.id, email: user.email, role: user.profile?.role || 'trader' } });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erreur technique !' });
+  }
 }
+
+
 
 export function logout(req, res) {
   res.clearCookie('token', {
