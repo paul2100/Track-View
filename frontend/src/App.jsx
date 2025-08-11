@@ -10,6 +10,8 @@ import Trades from './pages/Trades';
 import PrivateRoute from './components/PrivateRoute';
 import Performance from './pages/Performance';
 import Account from './pages/Account';
+import Settings from './pages/Settings';
+
 
 
 
@@ -29,6 +31,7 @@ function App() {
           <Route path="/trades" element={<Trades />} />
           <Route path="/performance" element={<Performance />} />
           <Route path="/account" element={<Account />} />
+          <Route path="/settings" element={<Settings />} />
         </Route>
 
       </Routes>

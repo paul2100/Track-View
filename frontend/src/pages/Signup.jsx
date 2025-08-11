@@ -23,7 +23,7 @@ function Signup() {
 
       if (res.data.success) {
       console.log('User registered successfully:', res.data.user);
-      setForm({ name: '', email: '', password: '' });
+      setForm({ username: '', email: '', password: '' });
       navigate('/login');
     } else {
       setError(res.data.error || 'Erreur lors de l’inscription');
@@ -73,12 +73,12 @@ function Signup() {
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="name">Name</label>
+            <label htmlFor="username">Name</label>
             <input
               type="text"
-              id="name"
-              name="name"
-              value={form.name}
+              id="username"
+              name="username"
+              value={form.username}
               onChange={handleChange}
               placeholder="JohnDoe"
               className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400"

@@ -52,6 +52,11 @@ useEffect(() => {
 
 
 
+
+
+
+
+
   return (
     <div>
         <Sidebar/>
@@ -71,18 +76,22 @@ useEffect(() => {
             <div className='relative  h-full'>
               <div className='absolute top left-0 w-full h-45 bg-black blur-[5px]'></div>
 
-              <div className='absolute bottom-25 z-10 px-6 py-5 border-4 my-2 border-white rounded-full bg-orange-500 text-white font-bold ml-4 '>
+              <div className='absolute bottom-25 z-10 px-6 py-4 border-4 my-2 border-white rounded-full bg-orange-500 text-white font-bold ml-4 '>
                 <p>{getInitial(user.email)}</p>
               </div>
 
 
-              <div className='absolute bottom-0 z-10 p-4'>
-                <p className="text-lg text-white font-semibold flex items-center my-2">{getPseudo(user.email)} <span className='px-3 py-1 ml-4 text-xs border rounded-full bg-transparent text-orange-500'>user</span></p>
-                <div className='text-gray-200'>
-                  <p>Joined {new Date(user.createdAt).toLocaleDateString('en-US', {year:'numeric' , month: 'long' , day:'numeric'})}</p>
-                  <p>{daysSince(user.createdAt)} {daysSince(user.createdAt) === 1 ? 'day' : 'days'} active</p>
+              <div className='absolute bottom-0 z-10 p-4 w-full'>
+                <div className='flex justify-between w-full'>
+                  <div className='text-gray-200 flex flex-col justify-end'>
+                    <p>Joined {new Date(user.createdAt).toLocaleDateString('en-US', {year:'numeric' , month: 'long' , day:'numeric'})}</p>
+                    <p>{daysSince(user.createdAt)} {daysSince(user.createdAt) === 1 ? 'day' : 'days'} active</p>
+                  </div>
+                  <div className='flex flex-col-reverse text-white'>
+                    <p className='text-xs'>Last connexion {new Date(user.profile.lastLogin).toLocaleDateString('en-US', {year:'numeric' , month: 'long' , day:'numeric' , hour:'numeric' , minute:'numeric'})}</p>
+                    <p className="text-lg text-white font-semibold flex justify-end my-2">{user.profile.username} <span className='px-3 ml-4 py-1 text-xs border rounded-full bg-transparent text-orange-500'>{user.profile.role}</span></p>
+                  </div>
                 </div>
-
               </div>
             </div>
           ) : (
@@ -92,24 +101,19 @@ useEffect(() => {
 
 
         
-        <div className="mt-10 bg-stone-300/10 rounded-lg p-4 shadow-lg shadow-stone-600">
-          <h3 className='text-white font-semibold mx-2'>Account Overview</h3>
+        <div className="mt-10 bg-stone-300/10 rounded-lg p-4 shadow-lg shadow-stone-600 border border-stone-300/20">
+          <h3 className='text-white text-lg font-semibold mx-3'>Account Overview</h3>
           {portefeuille ? (
-            // Si l'user a un portefeuille alors on. affiche ces infos 
-            <div className="flex md:flex-row flex-col">
+            <div className="flex md:flex-row flex-col mt-2">
               <CardAccountDetails title="Initial capital" value={portefeuille.solde_initial} currency={portefeuille.currency} img='/src/assets/icon.svg' />
               <CardAccountDetails title="Current capital" value={portefeuille.capital_actuel} currency={portefeuille.currency} img='/src/assets/icon.svg' />
               <CardAccountDetails title="Leverage" value={portefeuille.leverage} img='/src/assets/icon.svg' />
               <CardAccountDetails title="Risk per trade" value={portefeuille.risk_per_trade + '%'} img='/src/assets/icon.svg' />
             </div>
           ) : (
-            // sinon on affiche le formulaire pour cree son portefeuille
             <FormAddCapital />
           )}
-        </div>
-
-
-        
+        </div>        
       </main>
     </div>
   )

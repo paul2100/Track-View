@@ -33,7 +33,7 @@ function FormAddCapital() {
     >
       <h2 className="text-2xl font-semibold text-center text-gray-800">Create your portfolio</h2>
 
-      <div className="flex flex-col">
+
         <label htmlFor="solde_initial" className="mb-1 text-sm font-medium text-gray-700">
           Initial balance
         </label>
@@ -63,7 +63,7 @@ function FormAddCapital() {
           <option value="$">$</option>
           <option value="£">£</option>
         </select>
-      </div>
+
 
         <label htmlFor="leverage" className="mb-1 text-sm font-medium text-gray-700">
           Leverage
