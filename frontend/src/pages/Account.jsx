@@ -45,6 +45,7 @@ useEffect(() => {
     .then(res => {
       if (res.status === 200) {
         setPortefeuille(res.data.portefeuille);
+        console.log(res.data.portefeuille)
       }
     });
 }, []);
