@@ -28,8 +28,13 @@ model UserProfile {
   userId           Int       @unique
   username         String?   @unique
   role             String    @default("trader")
+  experience       String?
+  language         String?
+  timezone         String?   @default("Europe/Paris")
   lastLogin        DateTime?
-  lastProfileUpdate DateTime?
+  tradingStyle     String?   @default("Swing Trading")
+  createdAt        DateTime?  @default(now())
+  lastProfileUpdate DateTime? @default(now())
   user             User      @relation(fields: [userId], references: [id])
 }
 

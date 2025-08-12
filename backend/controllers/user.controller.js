@@ -1,5 +1,5 @@
-import { profile } from 'console';
 import prisma from '../prisma/client.js';
+import bcrypt from 'bcrypt';
 
 export async function getUser(req, res) {
   try {
@@ -17,9 +17,13 @@ export async function getUser(req, res) {
             role: true,
             lastLogin: true,
             lastProfileUpdate: true,
-          }
-        }
-      }
+            experience: true,
+            language: true,
+            timezone: true,
+            tradingStyle: true,
+          },
+        },
+      },
     });
 
     if (!user) {
@@ -38,48 +42,19 @@ export async function updateUserProfile(req , res) {
 
   try {
     const userId = req.user.id;
-    const {email , password , experience , goalReturn , language , timezone , tradingStyle , username} = req.body;
-    
-
-    const user = await prisma.user.findUnique({
-      where: {
-        id: userId
-      },
-      select: {
-        email: true,
-        password: true,
-        profile: {
-          select: {
-            experience: true,
-            goalReturn: true,
-            language: true,
-            timezone: true,
-            tradingStyle: true,
-            username: true
-          },
-        },
-      },
-    });
-
-
-    if (!user) {
-      return res.status(404).json({ success: false, error: 'Utilisateur non trouvé' });
-    }
-
-
+    const {experience , language , timezone , tradingStyle , username} = req.body;
+  
     const updateUser = await prisma.user.update({
       where: { id: userId },
       data: {
-        email,
-        password,
         profile: {
           update: {
             experience,
-            goalReturn,
             language,
             timezone,
             tradingStyle,
-            username
+            username,
+            lastProfileUpdate: new Date(),
           },
         },
       },
@@ -97,3 +72,5 @@ export async function updateUserProfile(req , res) {
     return res.status(500).json({ success: false, error: 'Erreur serveur' });
   }
 }
+
+
